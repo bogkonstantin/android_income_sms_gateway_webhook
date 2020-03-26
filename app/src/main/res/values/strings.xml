@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Incoming Sms Gateway</string>
+    <string name="input_phone">66123456789</string>
+    <string name="input_url">https://example.com</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_yes">Delete</string>
+    <string name="key_phones_preference">phones</string>
+</resources>

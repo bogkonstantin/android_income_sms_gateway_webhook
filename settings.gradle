@@ -1,0 +1,2 @@
+rootProject.name='Incoming Sms Gateway'
+include ':app'
