@@ -1,5 +1,6 @@
 *.apk
 *.ap_
+*.aab
 
 # Android Studio
 *.iml
