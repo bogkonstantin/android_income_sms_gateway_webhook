@@ -1,0 +1,23 @@
+Privacy Policy
+"Incoming SMS Webhook Gateway" (App) does not require any personal information. Therefore App cannot disclose any information.
+
+The Privacy Policy is open to the public at all times so you may read the full text of the Privacy Policy whenever you need to do so.
+Any changes to the Privacy Policy will be NOT notified to you.
+
+App will not collect any personal information.
+In order to provide the basic features and other specialized functionality of the App your personal information is not needed.
+
+App will NOT collect the following information:
+- Any incoming and outcoming sms from your device
+- First-name, last-name
+- Any passwords from your device (WiFi, brwoser etc)
+- Any GPS information
+- Any calls information
+- Any contacts
+
+To use App you only need to launch app. Entered phone number or sender name will be transferred only to url, provided by you.
+App will store it in local phone storage and will not use it in other way.
+
+The App works as is. The authors do not bear any responsibility for your device, per your money which can be debited from your account by your operator.
+You re-send a SMS text to provided url from your phone and its Internet connection.
+App Authors do not carry responsibility for operator or internet services.
