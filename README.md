@@ -1,5 +1,5 @@
 # Simple incoming SMS gateway  
-Set sender phone number or name and URL.  
+Set sender phone number or name and URL. If you want to send any SMS - use * (asterisk symbol) as a name.
 Every incoming SMS will be send immediately to provided URL.  
 Use it as Webhook for you SMS  
 

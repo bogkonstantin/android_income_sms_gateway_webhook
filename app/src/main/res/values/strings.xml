@@ -6,4 +6,8 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_yes">Delete</string>
     <string name="key_phones_preference">phones</string>
+    <string name="label_sender">Sender (number or text)</string>
+    <string name="label_url">Webhook URL</string>
+    <string name="hint_sender">number or text</string>
+    <string name="sender_recommendation">Use * symbol as "any"</string>
 </resources>

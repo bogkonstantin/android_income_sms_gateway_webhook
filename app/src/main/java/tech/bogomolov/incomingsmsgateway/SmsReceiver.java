@@ -34,7 +34,8 @@ public class SmsReceiver extends BroadcastReceiver {
                     String sender = message.getOriginatingAddress();
 
                     for (Map.Entry<String, ?> entry : configs.entrySet()) {
-                        if (sender.equals(entry.getKey())) {
+                        String entryKey = entry.getKey();
+                        if (sender.equals(entryKey) || entryKey.equals("*")) {
                             JSONObject messageData = new JSONObject();
                             try {
                                 messageData.put("from", sender);
