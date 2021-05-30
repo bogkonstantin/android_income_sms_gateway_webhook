@@ -6,55 +6,67 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.util.Map;
 
 public class SmsReceiver extends BroadcastReceiver {
-    private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(SMS_RECEIVED)) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                Object[] pdus = (Object[]) bundle.get("pdus");
-                if (pdus.length == 0) {
-                    return;
-                }
+        Bundle bundle = intent.getExtras();
+        if (bundle == null) {
+            return;
+        }
 
-                SharedPreferences sharedPref = context.getSharedPreferences(
-                        "phones",
-                        Context.MODE_PRIVATE
-                );
-                Map<String, ?> configs = sharedPref.getAll();
-                for (int i = 0; i < pdus.length; i++) {
-                    SmsMessage message = SmsMessage.createFromPdu((byte[]) pdus[i]);
-                    String sender = message.getOriginatingAddress();
 
-                    for (Map.Entry<String, ?> entry : configs.entrySet()) {
-                        String entryKey = entry.getKey();
-                        if (sender.equals(entryKey) || entryKey.equals("*")) {
-                            JSONObject messageData = new JSONObject();
-                            try {
-                                messageData.put("from", sender);
-                                messageData.put("text", message.getMessageBody());
-                            } catch (Exception e) {
-                                // TODO handle
-                            }
+        Object[] pdus = (Object[]) bundle.get("pdus");
+        if (pdus == null || pdus.length == 0) {
+            return;
+        }
 
-                            String[] params = new String[2];
-                            params[0] = (String) entry.getValue();
-                            params[1] = messageData.toString();
+        Map<String, ?> configs = this.getConfigs(context);
 
-                            WebhookCaller webhookCaller = new WebhookCaller();
-                            webhookCaller.execute(params);
-                            break;
-                        }
-                    }
+        for (Object pdu : pdus) {
+            SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu);
+            String sender = message.getOriginatingAddress();
+
+            for (Map.Entry<String, ?> entry : configs.entrySet()) {
+                String entryKey = entry.getKey();
+                if (sender.equals(entryKey) || entryKey.equals("*")) {
+
+                    JSONObject messageJson = this.prepareMessage(sender, message.getMessageBody());
+
+                    this.callWebHook((String) entry.getValue(), messageJson.toString());
+
+                    break;
                 }
             }
         }
+    }
+
+    protected void callWebHook(String url, String message) {
+        new WebhookCaller().execute(url, message);
+    }
+
+    private Map<String, ?> getConfigs(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.key_phones_preference),
+                Context.MODE_PRIVATE
+        );
+        return sharedPref.getAll();
+    }
+
+    private JSONObject prepareMessage(String sender, String message) {
+        JSONObject messageData = new JSONObject();
+        try {
+            messageData.put("from", sender);
+            messageData.put("text", message);
+        } catch (Exception e) {
+            Log.e("SmsGateway", "Exception prepareMessage" + e);
+        }
+
+        return messageData;
     }
 }

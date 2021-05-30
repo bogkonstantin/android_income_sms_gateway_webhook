@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
-                        SharedPreferences sharedPref = getSharedPreferences(
-                                getString(R.string.key_phones_preference),
+                        SharedPreferences sharedPref = context.getSharedPreferences(
+                                "phones",
                                 Context.MODE_PRIVATE
                         );
                         SharedPreferences.Editor editor = sharedPref.edit();
