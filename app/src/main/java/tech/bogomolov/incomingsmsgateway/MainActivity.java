@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -54,18 +56,31 @@ public class MainActivity extends AppCompatActivity {
                 final EditText urlInput = (EditText) view.findViewById(R.id.input_url);
 
                 builder.setView(view);
-                builder.setPositiveButton(R.string.btn_add, new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.btn_add, null);
+                builder.setNegativeButton(R.string.btn_cancel, null);
+                final AlertDialog dialog = builder.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id) {
+                    public void onClick(View view) {
                         String phone = phoneInput.getText().toString();
                         if (TextUtils.isEmpty(phone)) {
+                            phoneInput.setError(getString(R.string.error_empty_sender));
                             return;
                         }
 
                         String url = urlInput.getText().toString();
                         if (TextUtils.isEmpty(url)) {
+                            urlInput.setError(getString(R.string.error_empty_url));
                             return;
                         }
+
+                        try {
+                            new URL(url);
+                        } catch (MalformedURLException e) {
+                            urlInput.setError(getString(R.string.error_wrong_url));
+                            return;
+                        }
+
 
                         SharedPreferences sharedPref = context.getSharedPreferences(
                                 "phones",
@@ -75,10 +90,10 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString(phone, url);
                         editor.commit();
                         loadPhoneList();
+
+                        dialog.dismiss();
                     }
                 });
-                builder.setNegativeButton(R.string.btn_cancel, null);
-                builder.show();
             }
         };
     }
