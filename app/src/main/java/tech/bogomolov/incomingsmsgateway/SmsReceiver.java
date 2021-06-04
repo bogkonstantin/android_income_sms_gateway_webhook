@@ -3,14 +3,13 @@ package tech.bogomolov.incomingsmsgateway;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 public class SmsReceiver extends BroadcastReceiver {
     @Override
@@ -26,20 +25,17 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
-        Map<String, ?> configs = this.getConfigs(context);
+        ArrayList<Config> configs = Config.getAll(context);
 
         for (Object pdu : pdus) {
             SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu);
             String sender = message.getOriginatingAddress();
 
-            for (Map.Entry<String, ?> entry : configs.entrySet()) {
-                String entryKey = entry.getKey();
-                if (sender.equals(entryKey) || entryKey.equals("*")) {
-
+            for (Config config : configs) {
+                if (sender.equals(config.getSender()) || config.getSender().equals("*")) {
                     JSONObject messageJson = this.prepareMessage(sender, message.getMessageBody());
 
-                    this.callWebHook((String) entry.getValue(), messageJson.toString());
-
+                    this.callWebHook(config.getUrl(), messageJson.toString());
                     break;
                 }
             }
@@ -48,14 +44,6 @@ public class SmsReceiver extends BroadcastReceiver {
 
     protected void callWebHook(String url, String message) {
         new WebhookCaller().execute(url, message);
-    }
-
-    private Map<String, ?> getConfigs(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.key_phones_preference),
-                Context.MODE_PRIVATE
-        );
-        return sharedPref.getAll();
     }
 
     private JSONObject prepareMessage(String sender, String message) {

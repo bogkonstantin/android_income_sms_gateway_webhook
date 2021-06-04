@@ -19,7 +19,7 @@ public class SmsReceiverTest {
     Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
     @Before
-    public void beforeEach() {
+    public void clearSharedPrefs() {
         SharedPreferences.Editor editor = this.getEditor();
         editor.clear();
         editor.commit();

@@ -4,13 +4,11 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -23,12 +21,30 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private Context context;
-    private ListView listview;
+    private ListAdapter listAdapter;
+
+    public void onDeleteClick(View view) {
+        final int position = (int) view.getTag(R.id.delete_button);
+        final Config config = listAdapter.getItem(position);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Delete record");
+        builder.setMessage("Do you really want to delete \"" + (config.getSender().equals("*") ? "Any" : config.getSender()) + "\" record?");
+
+        builder.setPositiveButton(R.string.btn_delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                listAdapter.remove(config);
+                config.remove();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_cancel, null);
+        builder.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +54,14 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
         context = this;
-        listview = (ListView) findViewById(R.id.listView);
+        ListView listview = findViewById(R.id.listView);
 
-        loadPhoneList();
+        ArrayList<Config> configs = Config.getAll(context);
+        listAdapter = new ListAdapter(configs, context);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_add);
+        listview.setAdapter(listAdapter);
+
+        FloatingActionButton fab = findViewById(R.id.btn_add);
         fab.setOnClickListener(this.showAddDialog());
     }
 
@@ -52,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
-                final EditText phoneInput = (EditText) view.findViewById(R.id.input_phone);
-                final EditText urlInput = (EditText) view.findViewById(R.id.input_url);
+                final EditText senderInput = view.findViewById(R.id.input_phone);
+                final EditText urlInput = view.findViewById(R.id.input_url);
 
                 builder.setView(view);
                 builder.setPositiveButton(R.string.btn_add, null);
@@ -62,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        String phone = phoneInput.getText().toString();
-                        if (TextUtils.isEmpty(phone)) {
-                            phoneInput.setError(getString(R.string.error_empty_sender));
+                        String sender = senderInput.getText().toString();
+                        if (TextUtils.isEmpty(sender)) {
+                            senderInput.setError(getString(R.string.error_empty_sender));
                             return;
                         }
 
@@ -81,64 +100,18 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
+                        Config config = new Config(context);
+                        config.setSender(sender);
+                        config.setUrl(url);
+                        config.save();
 
-                        SharedPreferences sharedPref = context.getSharedPreferences(
-                                "phones",
-                                Context.MODE_PRIVATE
-                        );
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString(phone, url);
-                        editor.commit();
-                        loadPhoneList();
+                        listAdapter.add(config);
 
                         dialog.dismiss();
                     }
                 });
             }
         };
-    }
-
-    private void loadPhoneList() {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                getString(R.string.key_phones_preference), Context.MODE_PRIVATE
-        );
-        Map<String, ?> configs = sharedPref.getAll();
-        final ArrayList<String> listToRender = new ArrayList<String>();
-        for (Map.Entry<String, ?> entry : configs.entrySet()) {
-            listToRender.add(entry.getKey() + "\n" + entry.getValue());
-        }
-
-        ArrayAdapter aAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listToRender);
-
-        listview.setAdapter(aAdapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String text = (String) parent.getItemAtPosition(position);
-                String lines[] = text.split("\\n");
-                final String phoneNumber = lines[0];
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Delete record");
-                builder.setMessage("Do you really want to delete " + phoneNumber + "?");
-
-                builder.setPositiveButton(R.string.btn_yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        SharedPreferences sharedPref = getSharedPreferences(
-                                getString(R.string.key_phones_preference),
-                                Context.MODE_PRIVATE
-                        );
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.remove(phoneNumber);
-                        editor.commit();
-                        loadPhoneList();
-                    }
-                });
-                builder.setNegativeButton(R.string.btn_cancel, null);
-                builder.show();
-            }
-        });
     }
 
     private void checkPermissions() {

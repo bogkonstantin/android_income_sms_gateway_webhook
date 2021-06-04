@@ -1,13 +1,21 @@
 package tech.bogomolov.incomingsmsgateway;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.GrantPermissionRule;
+import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,37 +29,28 @@ import static org.hamcrest.Matchers.*;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
+    Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
             new ActivityScenarioRule(MainActivity.class);
 
-    @Rule
-    public GrantPermissionRule mGrantPermissionRule =
-            GrantPermissionRule.grant(
-                    "android.permission.RECEIVE_SMS");
+
+    @Before
+    public void clearSharedPrefs() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                context.getString(R.string.key_phones_preference),
+                Context.MODE_PRIVATE
+        );
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+    }
 
     @Test
     public void testAddDialogOpen() {
         onView(withId(R.id.btn_add)).perform(click());
         onView(withId(R.id.dialog_add)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testAddNewRecord() {
-        String sender = "1234";
-        String url = "https://example.com";
-
-        onView(withId(R.id.btn_add)).perform(click());
-        onView(withId(R.id.input_phone)).perform(typeText(sender));
-        onView(withId(R.id.input_url)).perform(typeText(url));
-
-        onView(withText("Add")).perform(click());
-
-        onView(allOf(withId(android.R.id.text1), withParent(withId(R.id.listView))))
-                .check(matches(withText(containsString(sender))))
-                .check(matches(withText(containsString(url))));
-
-        onView(withId(R.id.dialog_add)).check(doesNotExist());
     }
 
     @Test
@@ -103,6 +102,44 @@ public class MainActivityTest {
                 .check(matches(hasErrorText(getResourceString(R.string.error_wrong_url))));
 
         dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testAddDeleteRecord() {
+        String sender = "1234";
+        String url = "https://example.com";
+
+        onView(withId(R.id.btn_add)).perform(click());
+        onView(withId(R.id.input_phone)).perform(typeText(sender));
+        onView(withId(R.id.input_url)).perform(typeText(url));
+
+        onView(withText("Add")).perform(click());
+
+        ViewInteraction record = onView(allOf(
+                hasDescendant(withText(containsString(sender))),
+                hasDescendant(withText(containsString(url))),
+                isDescendantOfA(withId(R.id.listView)))
+        );
+        record.check(matches(isDisplayed()));
+
+        onView(withId(R.id.dialog_add)).check(doesNotExist());
+
+
+        ViewInteraction deleteButton = onView(allOf(
+                withId(R.id.delete_button),
+                isDescendantOfA(withId(R.id.listView)),
+                withText("Delete"),
+                isDisplayed())
+        );
+        deleteButton.perform(click());
+
+        onView(withText("Delete record")).check(matches(isDisplayed()));
+
+        onView(allOf(withId(android.R.id.button1), withText("Delete"))).perform(click());
+
+        onView(withText("Delete record")).check(doesNotExist());
+        record.check(doesNotExist());
+        onView(withId(R.id.dialog_add)).check(doesNotExist());
     }
 
     private String getResourceString(int id) {
