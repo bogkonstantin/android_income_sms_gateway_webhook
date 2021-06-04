@@ -61,7 +61,7 @@ public class MainActivityTest {
         onView(withId(R.id.input_url))
                 .perform(typeText("https://example.com"));
 
-        onView(withText("Add")).perform(click());
+        onView(withText(R.string.btn_add)).perform(click());
 
         onView(withId(R.id.input_phone))
                 .check(matches(hasErrorText(getResourceString(R.string.error_empty_sender))));
@@ -77,7 +77,7 @@ public class MainActivityTest {
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
 
-        onView(withText("Add")).perform(click());
+        onView(withText(R.string.btn_add)).perform(click());
 
         onView(withId(R.id.input_url))
                 .check(matches(hasErrorText(getResourceString(R.string.error_empty_url))));
@@ -96,7 +96,7 @@ public class MainActivityTest {
         onView(withId(R.id.input_url))
                 .perform(typeText("not url"));
 
-        onView(withText("Add")).perform(click());
+        onView(withText(R.string.btn_add)).perform(click());
 
         onView(withId(R.id.input_url))
                 .check(matches(hasErrorText(getResourceString(R.string.error_wrong_url))));
@@ -113,7 +113,7 @@ public class MainActivityTest {
         onView(withId(R.id.input_phone)).perform(typeText(sender));
         onView(withId(R.id.input_url)).perform(typeText(url));
 
-        onView(withText("Add")).perform(click());
+        onView(withText(R.string.btn_add)).perform(click());
 
         ViewInteraction record = onView(allOf(
                 hasDescendant(withText(containsString(sender))),
@@ -128,16 +128,16 @@ public class MainActivityTest {
         ViewInteraction deleteButton = onView(allOf(
                 withId(R.id.delete_button),
                 isDescendantOfA(withId(R.id.listView)),
-                withText("Delete"),
+                withText(R.string.btn_delete),
                 isDisplayed())
         );
         deleteButton.perform(click());
 
-        onView(withText("Delete record")).check(matches(isDisplayed()));
+        onView(withText(R.string.delete_record)).check(matches(isDisplayed()));
 
-        onView(allOf(withId(android.R.id.button1), withText("Delete"))).perform(click());
+        onView(allOf(withId(android.R.id.button1), withText(R.string.btn_delete))).perform(click());
 
-        onView(withText("Delete record")).check(doesNotExist());
+        onView(withText(R.string.delete_record)).check(doesNotExist());
         record.check(doesNotExist());
         onView(withId(R.id.dialog_add)).check(doesNotExist());
     }

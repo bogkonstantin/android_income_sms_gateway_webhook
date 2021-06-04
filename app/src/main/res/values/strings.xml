@@ -5,6 +5,7 @@
     <string name="btn_add">Add</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_delete">Delete</string>
+    <string name="delete_record">Delete record</string>
     <string name="key_phones_preference">phones</string>
     <string name="label_add_sender">Sender (number or text)</string>
     <string name="label_sender">Sender</string>
@@ -14,4 +15,7 @@
     <string name="error_empty_sender">Empty sender</string>
     <string name="error_empty_url">Empty URL</string>
     <string name="error_wrong_url">Wrong URL</string>
+    <string name="asterisk">*</string>
+    <string name="any">Any</string>
+    <string name="confirm_delete">Do you really want to delete "%s" record?</string>
 </resources>

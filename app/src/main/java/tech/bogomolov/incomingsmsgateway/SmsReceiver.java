@@ -26,13 +26,14 @@ public class SmsReceiver extends BroadcastReceiver {
         }
 
         ArrayList<Config> configs = Config.getAll(context);
+        String asterisk = context.getString(R.string.asterisk);
 
         for (Object pdu : pdus) {
             SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu);
             String sender = message.getOriginatingAddress();
 
             for (Config config : configs) {
-                if (sender.equals(config.getSender()) || config.getSender().equals("*")) {
+                if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
                     JSONObject messageJson = this.prepareMessage(sender, message.getMessageBody());
 
                     this.callWebHook(config.getUrl(), messageJson.toString());

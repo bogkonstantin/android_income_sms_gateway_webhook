@@ -37,8 +37,10 @@ public class ListAdapter extends ArrayAdapter<Config> {
         Config config = getItem(position);
 
         String senderText = config.getSender();
+        String asterisk = context.getString(R.string.asterisk);
+        String any = context.getString(R.string.any);
         TextView sender = row.findViewById(R.id.text_sender);
-        sender.setText(senderText.equals("*") ? "Any" : senderText);
+        sender.setText(senderText.equals(asterisk) ? any : senderText);
 
         TextView url = row.findViewById(R.id.text_url);
         url.setText(config.getUrl());

@@ -32,8 +32,12 @@ public class MainActivity extends AppCompatActivity {
         final Config config = listAdapter.getItem(position);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Delete record");
-        builder.setMessage("Do you really want to delete \"" + (config.getSender().equals("*") ? "Any" : config.getSender()) + "\" record?");
+        builder.setTitle(R.string.delete_record);
+        String asterisk = context.getString(R.string.asterisk);
+        String any = context.getString(R.string.any);
+        String message = context.getString(R.string.confirm_delete);
+        message = String.format(message, (config.getSender().equals(asterisk) ? any : config.getSender()));
+        builder.setMessage(message);
 
         builder.setPositiveButton(R.string.btn_delete, new DialogInterface.OnClickListener() {
             @Override

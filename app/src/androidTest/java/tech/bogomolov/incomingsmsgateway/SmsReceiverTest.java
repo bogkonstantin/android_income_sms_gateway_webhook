@@ -35,7 +35,7 @@ public class SmsReceiverTest {
 
     @Test
     public void testSmsPassedToWebhookByWildcard() {
-        this.setPhoneConfig(appContext, "*");
+        this.setPhoneConfig(appContext, appContext.getString(R.string.asterisk));
         SmsReceiver receiver = this.getSmsReceiver();
         receiver.onReceive(appContext, this.getIntent());
 
