@@ -66,6 +66,8 @@ public class WebHookWorkRequest extends Worker {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
+            urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            urlConnection.setRequestProperty("User-agent", "SMS Forwarder App");
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
