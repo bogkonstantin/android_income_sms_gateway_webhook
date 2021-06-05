@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onDeleteClick(View view) {
         final int position = (int) view.getTag(R.id.delete_button);
-        final Config config = listAdapter.getItem(position);
+        final ForwardingConfig config = listAdapter.getItem(position);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(R.string.delete_record);
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         ListView listview = findViewById(R.id.listView);
 
-        ArrayList<Config> configs = Config.getAll(context);
+        ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
         listAdapter = new ListAdapter(configs, context);
 
         listview.setAdapter(listAdapter);
@@ -104,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
-                        Config config = new Config(context);
+                        ForwardingConfig config = new ForwardingConfig(context);
                         config.setSender(sender);
                         config.setUrl(url);
                         config.save();

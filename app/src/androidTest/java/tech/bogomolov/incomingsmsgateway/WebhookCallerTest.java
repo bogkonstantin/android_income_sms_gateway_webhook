@@ -1,36 +1,65 @@
 package tech.bogomolov.incomingsmsgateway;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import android.content.Context;
+import android.util.Log;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.work.Configuration;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.testing.SynchronousExecutor;
+import androidx.work.testing.WorkManagerTestInitHelper;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class WebhookCallerTest {
 
-    @Test
-    public void testSuccess() {
-        WebhookCaller webhookCaller = new WebhookCaller();
-        String result = webhookCaller.doInBackground("https://example.com", "test");
+    @Before
+    public void setup() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Configuration config = new Configuration.Builder()
+                .setMinimumLoggingLevel(Log.DEBUG)
+                .setExecutor(new SynchronousExecutor())
+                .build();
 
-        assertEquals(result, WebhookCaller.RESULT_SUCCESS);
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+                context, config);
     }
 
     @Test
-    public void testError() {
-        WebhookCaller webhookCaller = new WebhookCaller();
-        String result = webhookCaller.doInBackground("not a url", "test");
-
-        assertEquals(result, WebhookCaller.RESULT_ERROR);
+    public void testSuccess() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo("https://example.com", "test");
+        assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
     }
 
     @Test
-    public void testConnectionError() {
-        WebhookCaller webhookCaller = new WebhookCaller();
-        String result = webhookCaller.doInBackground("https://urlisnotexisterrortest.ee", "test");
+    public void testError() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo("not a url", "test");
+        assertThat(workInfo.getState(), is(WorkInfo.State.FAILED));
+    }
 
-        assertEquals(result, WebhookCaller.RESULT_CONNECTION_ERROR);
+    private WorkInfo getWorkInfo(String url, String text) throws Exception {
+        Data input = new Data.Builder()
+                .put(WebHookWorkRequest.DATA_URL, url)
+                .put(WebHookWorkRequest.DATA_TEXT, text)
+                .build();
+
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WebHookWorkRequest.class)
+                .setInputData(input)
+                .build();
+
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        workManager.enqueue(request).getResult().get();
+        return workManager.getWorkInfoById(request.getId()).get();
     }
 }

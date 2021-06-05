@@ -6,13 +6,13 @@ import android.content.SharedPreferences;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Config {
+public class ForwardingConfig {
     final private Context context;
 
     private String sender;
     private String url;
 
-    public Config(Context context) {
+    public ForwardingConfig(Context context) {
         this.context = context;
     }
 
@@ -20,18 +20,16 @@ public class Config {
         return this.sender;
     }
 
-    public Config setSender(String sender) {
+    public void setSender(String sender) {
         this.sender = sender;
-        return this;
     }
 
     public String getUrl() {
         return this.url;
     }
 
-    public Config setUrl(String url) {
+    public void setUrl(String url) {
         this.url = url;
-        return this;
     }
 
     public void save() {
@@ -40,14 +38,14 @@ public class Config {
         editor.commit();
     }
 
-    public static ArrayList<Config> getAll(Context context) {
+    public static ArrayList<ForwardingConfig> getAll(Context context) {
         SharedPreferences sharedPref = getPreference(context);
         Map<String, ?> sharedPrefs = sharedPref.getAll();
 
-        ArrayList<Config> configs = new ArrayList<Config>();
+        ArrayList<ForwardingConfig> configs = new ArrayList<ForwardingConfig>();
 
         for (Map.Entry<String, ?> entry : sharedPrefs.entrySet()) {
-            Config config = new Config(context);
+            ForwardingConfig config = new ForwardingConfig(context);
             config.setSender(entry.getKey());
             config.setUrl((String) entry.getValue());
             configs.add(config);

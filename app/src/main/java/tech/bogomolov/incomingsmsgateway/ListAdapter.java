@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListAdapter extends ArrayAdapter<Config> {
-    final private ArrayList<Config> dataSet;
+public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
+    final private ArrayList<ForwardingConfig> dataSet;
     Context context;
 
-    public ListAdapter(ArrayList<Config> data, Context context) {
+    public ListAdapter(ArrayList<ForwardingConfig> data, Context context) {
         super(context, R.layout.list_item, data);
         this.dataSet = data;
         this.context = context;
@@ -34,7 +34,7 @@ public class ListAdapter extends ArrayAdapter<Config> {
             row = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        Config config = getItem(position);
+        ForwardingConfig config = getItem(position);
 
         String senderText = config.getSender();
         String asterisk = context.getString(R.string.asterisk);
