@@ -37,8 +37,14 @@ public class WebhookCallerTest {
     }
 
     @Test
-    public void testSuccess() throws Exception {
+    public void testHttpsSuccess() throws Exception {
         WorkInfo workInfo = this.getWorkInfo("https://example.com", "test");
+        assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
+    }
+
+    @Test
+    public void testHttpSuccess() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo("http://example.com", "test");
         assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
     }
 
