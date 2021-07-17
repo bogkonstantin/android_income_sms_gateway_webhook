@@ -15,13 +15,15 @@ If the phone is not connected to the internet, the app will wait for the connect
 ## Download apk
 Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
 
-<a href="https://apt.izzysoft.de/fdroid/index/apk/tech.bogomolov.incomingsmsgateway">
-  <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height="70px">
-</a>
-<br>
-<a href="https://amzn.to/3cpxXGk">
-  &nbsp;&nbsp;<img src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-black.png" height="50px">
-</a>
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
+
+
+[<img src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-black.png"
+     alt="Get it on Amazon App Store"
+     height="55">](https://amzn.to/3cpxXGk)
+
 
 ## Recommendation
 Use external monitoring tools like [UpTime.onl](https://uptime.onl/) to monitor your webhook URL and prevent it from downtime.
