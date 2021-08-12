@@ -9,6 +9,20 @@ If the response code is not 2XX or the request ended with a connection error, th
 Minimum first retry will be after 10 seconds, later wait time will increase exponentially.
 If the phone is not connected to the internet, the app will wait for the connection before the next attempt.
 
+### Request info
+HTTP method: POST  
+Content-type: application/json; charset=utf-8  
+User-agent: SMS Forwarder App  
+
+### Request example
+Use this curl sample request to prepare your backend code
+```bash
+curl -X 'POST' 'https://yourwebsite.com/path' \
+     -H 'user-agent: SMS Forwarder App' \
+     -H 'content-type: application/json; charset=utf-8' \
+     -d $'{"from":"1234567890","text":"Test"}'
+```
+
 ## Screenshots
 <img alt="Incoming SMS Webhook Gateway screenshot 1" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 2" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 3" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="30%"/>
 
