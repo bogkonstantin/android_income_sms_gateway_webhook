@@ -37,7 +37,3 @@ Download apk from [release page](https://github.com/bogkonstantin/android_income
 [<img src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-black.png"
      alt="Get it on Amazon App Store"
      height="55">](https://amzn.to/3cpxXGk)
-
-
-## Recommendation
-Use external monitoring tools like [UpTime.onl](https://uptime.onl/) to monitor your webhook URL and prevent it from downtime.
