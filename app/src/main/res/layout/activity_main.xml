@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/info_notice"
+        />
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"

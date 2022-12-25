@@ -10,7 +10,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,6 +27,42 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context;
     private ListAdapter listAdapter;
+
+    private static final int PERMISSION_CODE = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, PERMISSION_CODE);
+        } else {
+            showList();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != PERMISSION_CODE) {
+            return;
+        }
+        for (int i = 0; i < permissions.length; i++) {
+            if (!permissions[i].equals(Manifest.permission.RECEIVE_SMS)) {
+                continue;
+            }
+
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                showList();
+            } else {
+                showInfo(getResources().getString(R.string.permission_needed));
+            }
+
+            return;
+        }
+
+
+    }
 
     public void onDeleteClick(View view) {
         final int position = (int) view.getTag(R.id.delete_button);
@@ -49,12 +87,8 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        checkPermissions();
+    private void showList() {
+        showInfo("");
 
         context = this;
         ListView listview = findViewById(R.id.listView);
@@ -66,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.btn_add);
         fab.setOnClickListener(this.showAddDialog());
+    }
+
+    private void showInfo(String text) {
+        TextView notice = findViewById(R.id.info_notice);
+        notice.setText(text);
     }
 
     private View.OnClickListener showAddDialog() {
@@ -115,12 +154,5 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         };
-    }
-
-    private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, 0);
-        }
     }
 }
