@@ -45,6 +45,12 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         TextView url = row.findViewById(R.id.text_url);
         url.setText(config.getUrl());
 
+        TextView template = row.findViewById(R.id.text_template);
+        template.setText(config.getTemplate());
+
+        TextView headers = row.findViewById(R.id.text_headers);
+        headers.setText(config.getHeaders());
+
         View deleteButton = row.findViewById(R.id.delete_button);
         deleteButton.setTag(R.id.delete_button, position);
 

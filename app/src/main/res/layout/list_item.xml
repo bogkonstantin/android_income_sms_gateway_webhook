@@ -15,7 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:labelFor="@+id/input_phone"
         android:text="@string/label_sender"
         android:textSize="12sp" />
 
@@ -31,7 +30,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
-        android:labelFor="@+id/input_phone"
         android:text="@string/label_url"
         android:textSize="12sp" />
 
@@ -43,6 +41,37 @@
         android:textSize="18sp"
         tools:ignore="RtlSymmetry" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:text="@string/label_json_template"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/text_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textSize="11sp"
+        android:typeface="monospace"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:text="@string/label_json_headers"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/text_headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textSize="11sp"
+        android:typeface="monospace"
+        tools:ignore="RtlSymmetry" />
 
     <RelativeLayout
         android:layout_width="fill_parent"

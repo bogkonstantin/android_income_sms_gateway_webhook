@@ -87,6 +87,15 @@
         android:textSize="11sp"
         android:text="@string/json_template_recommendation" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="16dp"
+        android:labelFor="@+id/input_json_headers"
+        android:text="@string/label_json_headers" />
+
     <EditText
         android:id="@+id/input_json_headers"
         android:layout_width="match_parent"
