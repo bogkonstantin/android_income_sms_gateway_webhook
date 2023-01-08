@@ -18,6 +18,7 @@ import androidx.work.WorkRequest;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -33,31 +34,47 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
-
         Object[] pdus = (Object[]) bundle.get("pdus");
         if (pdus == null || pdus.length == 0) {
             return;
         }
 
+        StringBuilder content = new StringBuilder();
+        final SmsMessage[] messages = new SmsMessage[pdus.length];
+        for (int i = 0; i < pdus.length; i++) {
+            messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+            content.append(messages[i].getDisplayMessageBody());
+        }
+
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
         String asterisk = context.getString(R.string.asterisk);
 
-        for (Object pdu : pdus) {
-            SmsMessage message = SmsMessage.createFromPdu((byte[]) pdu);
-            String sender = message.getOriginatingAddress();
+        String sender = messages[0].getOriginatingAddress();
 
-            for (ForwardingConfig config : configs) {
-                if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
-                    JSONObject messageJson = this.prepareMessage(sender, message.getMessageBody());
-
-                    this.callWebHook(config.getUrl(), messageJson.toString());
-                    break;
-                }
+        ForwardingConfig matchedConfig = null;
+        for (ForwardingConfig config : configs) {
+            if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
+                matchedConfig = config;
+                break;
             }
         }
+
+        if (matchedConfig == null) {
+            return;
+        }
+
+        String messageContent = matchedConfig.getTemplate()
+                .replaceAll("%from%", sender)
+                .replaceAll("%text%",
+                        content.toString().replaceAll("\"", "\\\\\""))
+                .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
+                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                .replaceAll("%sim%", this.detectSim(bundle));
+
+        this.callWebHook(matchedConfig.getUrl(), messageContent, matchedConfig.getHeaders());
     }
 
-    protected void callWebHook(String url, String message) {
+    protected void callWebHook(String url, String message, String headers) {
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -66,6 +83,7 @@ public class SmsReceiver extends BroadcastReceiver {
         Data data = new Data.Builder()
                 .putString(WebHookWorkRequest.DATA_URL, url)
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
+                .putString(WebHookWorkRequest.DATA_HEADERS, headers)
                 .build();
 
         WorkRequest webhookWorkRequest =
@@ -85,15 +103,55 @@ public class SmsReceiver extends BroadcastReceiver {
 
     }
 
-    private JSONObject prepareMessage(String sender, String message) {
-        JSONObject messageData = new JSONObject();
-        try {
-            messageData.put("from", sender);
-            messageData.put("text", message);
-        } catch (Exception e) {
-            Log.e("SmsGateway", "Exception prepareMessage" + e);
+    private String detectSim(Bundle bundle) {
+        int slotId = -1;
+        Set<String> keySet = bundle.keySet();
+        for (String key : keySet) {
+            switch (key) {
+                case "phone":
+                    slotId = bundle.getInt("phone", -1);
+                    break;
+                case "slot":
+                    slotId = bundle.getInt("slot", -1);
+                    break;
+                case "simId":
+                    slotId = bundle.getInt("simId", -1);
+                    break;
+                case "simSlot":
+                    slotId = bundle.getInt("simSlot", -1);
+                    break;
+                case "slot_id":
+                    slotId = bundle.getInt("slot_id", -1);
+                    break;
+                case "simnum":
+                    slotId = bundle.getInt("simnum", -1);
+                    break;
+                case "slotId":
+                    slotId = bundle.getInt("slotId", -1);
+                    break;
+                case "slotIdx":
+                    slotId = bundle.getInt("slotIdx", -1);
+                    break;
+                default:
+                    if (key.toLowerCase().contains("slot") | key.toLowerCase().contains("sim")) {
+                        String value = bundle.getString(key, "-1");
+                        if (value.equals("0") | value.equals("1") | value.equals("2")) {
+                            slotId = bundle.getInt(key, -1);
+                        }
+                    }
+            }
+
+            if (slotId != -1) {
+                break;
+            }
         }
 
-        return messageData;
+        if (slotId == 0) {
+            return "sim1";
+        } else if (slotId == 1) {
+            return "sim2";
+        } else {
+            return "undetected";
+        }
     }
 }

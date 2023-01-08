@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -17,11 +19,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 public class WebHookWorkRequest extends Worker {
 
     public final static String DATA_URL = "URL";
     public final static String DATA_TEXT = "TEXT";
+    public final static String DATA_HEADERS = "HEADERS";
     public static final int MAX_ATTEMPT = 10;
 
     public static final String RESULT_SUCCESS = "success";
@@ -43,8 +47,9 @@ public class WebHookWorkRequest extends Worker {
 
         String url = getInputData().getString(DATA_URL);
         String text = getInputData().getString(DATA_TEXT);
+        String headers = getInputData().getString(DATA_HEADERS);
 
-        String result = this.makeRequest(url, text);
+        String result = this.makeRequest(url, text, headers);
 
         if (result.equals(RESULT_RETRY)) {
             return Result.retry();
@@ -57,7 +62,7 @@ public class WebHookWorkRequest extends Worker {
         return Result.success();
     }
 
-    private String makeRequest(String urlString, String text) {
+    private String makeRequest(String urlString, String text, String headers) {
         String result = RESULT_SUCCESS;
         HttpURLConnection urlConnection = null;
 
@@ -66,8 +71,20 @@ public class WebHookWorkRequest extends Worker {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
+
             urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-            urlConnection.setRequestProperty("User-agent", "SMS Forwarder App");
+
+            JSONObject headersObj = new JSONObject(headers);
+            Iterator<String> keys = headersObj.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if (headersObj.get(key) instanceof JSONObject) {
+                    Log.e("SmsGateway", "only string supported in json");
+                    continue;
+                }
+
+                urlConnection.setRequestProperty(key, (String) headersObj.get(key));
+            }
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));

@@ -19,6 +19,9 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -115,6 +118,11 @@ public class MainActivity extends AppCompatActivity {
                 View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
                 final EditText senderInput = view.findViewById(R.id.input_phone);
                 final EditText urlInput = view.findViewById(R.id.input_url);
+                final EditText templateInput = view.findViewById(R.id.input_json_template);
+                final EditText headersInput = view.findViewById(R.id.input_json_headers);
+
+                templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
+                headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
 
                 builder.setView(view);
                 builder.setPositiveButton(R.string.btn_add, null);
@@ -142,9 +150,27 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
+                        String template = templateInput.getText().toString();
+                        try {
+                            JSONObject jsonObject = new JSONObject(template);
+                        } catch (JSONException e) {
+                            templateInput.setError(getString(R.string.error_wrong_json));
+                            return;
+                        }
+
+                        String headers = headersInput.getText().toString();
+                        try {
+                            JSONObject jsonObject = new JSONObject(headers);
+                        } catch (JSONException e) {
+                            headersInput.setError(getString(R.string.error_wrong_json));
+                            return;
+                        }
+
                         ForwardingConfig config = new ForwardingConfig(context);
                         config.setSender(sender);
                         config.setUrl(url);
+                        config.setTemplate(template);
+                        config.setHeaders(headers);
                         config.save();
 
                         listAdapter.add(config);

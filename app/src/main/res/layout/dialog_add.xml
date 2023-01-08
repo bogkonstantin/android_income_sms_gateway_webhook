@@ -51,8 +51,54 @@
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="sans-serif"
         android:hint="@string/input_url"
         android:inputType="textUri" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:labelFor="@+id/input_json_template"
+        android:text="@string/label_json_template" />
+
+    <EditText
+        android:id="@+id/input_json_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        android:maxLines="10"
+        android:typeface="monospace"
+        android:textSize="11sp"
+        android:inputType="textMultiLine" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="-4dp"
+        android:textSize="11sp"
+        android:text="@string/json_template_recommendation" />
+
+    <EditText
+        android:id="@+id/input_json_headers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        android:maxLines="5"
+        android:typeface="monospace"
+        android:textSize="11sp"
+        android:inputType="textMultiLine" />
+
 </LinearLayout>
