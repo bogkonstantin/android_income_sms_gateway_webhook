@@ -30,7 +30,8 @@ public class SmsReceiverTest {
         SmsReceiver receiver = this.getSmsReceiver();
         receiver.onReceive(appContext, this.getIntent());
 
-        Mockito.verify(receiver, Mockito.times(0)).callWebHook(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(receiver, Mockito.times(0))
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
     }
 
     @Test
@@ -39,7 +40,8 @@ public class SmsReceiverTest {
         SmsReceiver receiver = this.getSmsReceiver();
         receiver.onReceive(appContext, this.getIntent());
 
-        Mockito.verify(receiver, Mockito.times(1)).callWebHook(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(receiver, Mockito.times(1))
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
     }
 
     @Test
@@ -48,7 +50,8 @@ public class SmsReceiverTest {
         SmsReceiver receiver = this.getSmsReceiver();
         receiver.onReceive(appContext, this.getIntent());
 
-        Mockito.verify(receiver, Mockito.times(1)).callWebHook(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(receiver, Mockito.times(1))
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
     }
 
     @Test
@@ -57,7 +60,20 @@ public class SmsReceiverTest {
         SmsReceiver receiver = this.getSmsReceiver();
         receiver.onReceive(appContext, this.getIntent());
 
-        Mockito.verify(receiver, Mockito.times(0)).callWebHook(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(receiver, Mockito.times(0))
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    }
+
+    @Test
+    public void testMultiplePdus() {
+        this.setPhoneConfig(appContext, appContext.getString(R.string.asterisk));
+        SmsReceiver receiver = this.getSmsReceiver();
+        receiver.onReceive(appContext, this.getIntentMultiPdus());
+
+        Mockito.verify(receiver, Mockito.times(1))
+                .callWebHook(Mockito.anyString(),
+                        Mockito.contains("\"text\":\"TestTest\""),
+                        Mockito.anyString());
     }
 
     private void setPhoneConfig(Context context, String phone) {
@@ -80,12 +96,18 @@ public class SmsReceiverTest {
         return intent;
     }
 
+    private Intent getIntentMultiPdus() {
+        Intent intent = new Intent(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        intent.putExtra("pdus", this.getTestMultiplePdu());
+        return intent;
+    }
+
     private SmsReceiver getSmsReceiver() {
         SmsReceiver receiver = Mockito.mock(SmsReceiver.class);
         Mockito.doCallRealMethod()
                 .when(receiver).onReceive(Mockito.any(Context.class), Mockito.any(Intent.class));
-        Mockito.doNothing()
-                .when(receiver).callWebHook(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(receiver)
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         return receiver;
     }
@@ -98,6 +120,16 @@ public class SmsReceiverTest {
         String pdu = "07914151551512f2040B916105551511f100006060605130308A04D4F29C0E";
         byte[][] pdus = new byte[1][];
         pdus[0] = hexToByteArray(pdu);
+
+        return pdus;
+    }
+
+    private byte[][] getTestMultiplePdu() {
+        String pdu = "07914151551512f2040B916105551511f100006060605130308A04D4F29C0E";
+
+        byte[][] pdus = new byte[2][];
+        pdus[0] = hexToByteArray(pdu);
+        pdus[1] = hexToByteArray(pdu);
 
         return pdus;
     }

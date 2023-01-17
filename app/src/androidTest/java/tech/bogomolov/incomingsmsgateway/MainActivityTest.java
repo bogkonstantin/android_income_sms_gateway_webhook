@@ -99,6 +99,94 @@ public class MainActivityTest {
     }
 
     @Test
+    public void tesEmptyJsonTemplateError() {
+        onView(withId(R.id.btn_add)).perform(click());
+        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+
+        onView(withId(R.id.input_phone))
+                .perform(typeText("test"));
+
+        onView(withId(R.id.input_url))
+                .perform(typeText("https://example.com"));
+
+        onView(withId(R.id.input_json_template))
+                .perform(replaceText(""));
+
+        onView(withText(R.string.btn_add)).perform(click());
+
+        onView(withId(R.id.input_json_template))
+                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
+
+        dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void tesWrongJsonTemplateError() {
+        onView(withId(R.id.btn_add)).perform(click());
+        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+
+        onView(withId(R.id.input_phone))
+                .perform(typeText("test"));
+
+        onView(withId(R.id.input_url))
+                .perform(typeText("https://example.com"));
+
+        onView(withId(R.id.input_json_template))
+                .perform(replaceText("{"));
+
+        onView(withText(R.string.btn_add)).perform(click());
+
+        onView(withId(R.id.input_json_template))
+                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
+
+        dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void tesEmptyJsonHeadersError() {
+        onView(withId(R.id.btn_add)).perform(click());
+        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+
+        onView(withId(R.id.input_phone))
+                .perform(typeText("test"));
+
+        onView(withId(R.id.input_url))
+                .perform(typeText("https://example.com"));
+
+        onView(withId(R.id.input_json_headers))
+                .perform(replaceText(""));
+
+        onView(withText(R.string.btn_add)).perform(click());
+
+        onView(withId(R.id.input_json_headers))
+                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
+
+        dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void tesWrongJsonHeadersError() {
+        onView(withId(R.id.btn_add)).perform(click());
+        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+
+        onView(withId(R.id.input_phone))
+                .perform(typeText("test"));
+
+        onView(withId(R.id.input_url))
+                .perform(typeText("https://example.com"));
+
+        onView(withId(R.id.input_json_headers))
+                .perform(replaceText("{"));
+
+        onView(withText(R.string.btn_add)).perform(click());
+
+        onView(withId(R.id.input_json_headers))
+                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
+
+        dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
     public void testAddDeleteRecord() {
         String sender = "1234";
         String url = "https://example.com";

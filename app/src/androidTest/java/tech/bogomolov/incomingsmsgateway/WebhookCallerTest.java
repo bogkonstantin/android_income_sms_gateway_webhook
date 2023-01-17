@@ -38,26 +38,27 @@ public class WebhookCallerTest {
 
     @Test
     public void testHttpsSuccess() throws Exception {
-        WorkInfo workInfo = this.getWorkInfo("https://example.com", "test");
+        WorkInfo workInfo = this.getWorkInfo("https://example.com", "test", "{}");
         assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
     }
 
     @Test
     public void testHttpSuccess() throws Exception {
-        WorkInfo workInfo = this.getWorkInfo("http://example.com", "test");
+        WorkInfo workInfo = this.getWorkInfo("http://example.com", "test", "{}");
         assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
     }
 
     @Test
     public void testError() throws Exception {
-        WorkInfo workInfo = this.getWorkInfo("not a url", "test");
+        WorkInfo workInfo = this.getWorkInfo("not a url", "test", "{}");
         assertThat(workInfo.getState(), is(WorkInfo.State.FAILED));
     }
 
-    private WorkInfo getWorkInfo(String url, String text) throws Exception {
+    private WorkInfo getWorkInfo(String url, String text, String headers) throws Exception {
         Data input = new Data.Builder()
                 .put(WebHookWorkRequest.DATA_URL, url)
                 .put(WebHookWorkRequest.DATA_TEXT, text)
+                .put(WebHookWorkRequest.DATA_HEADERS, headers)
                 .build();
 
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WebHookWorkRequest.class)
