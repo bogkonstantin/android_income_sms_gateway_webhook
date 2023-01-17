@@ -16,6 +16,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
+            android:exported="true"
             android:name="tech.bogomolov.incomingsmsgateway.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
@@ -26,6 +27,7 @@
         </activity>
 
         <receiver
+            android:exported="true"
             android:name="tech.bogomolov.incomingsmsgateway.SmsReceiver"
             android:enabled="true">
             <intent-filter android:priority="2147483647">
