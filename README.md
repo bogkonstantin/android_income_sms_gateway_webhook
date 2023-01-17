@@ -14,16 +14,43 @@ If the phone is not connected to the internet, the app will wait for the connect
 ### Request info
 HTTP method: POST  
 Content-type: application/json; charset=utf-8  
-User-agent: SMS Forwarder App  
+
+Sample payload:  
+```json
+{
+     "from": "%from%",
+     "text": "%text%",
+     "sentStamp": "%sentStamp%",
+     "receivedStamp": "%receivedStamp%",
+     "sim": "%sim%"
+}
+```
+
+Available placeholders:
+%from%
+%text%
+%sentStamp%
+%receivedStamp%
+%sim%
 
 ### Request example
 Use this curl sample request to prepare your backend code
 ```bash
 curl -X 'POST' 'https://yourwebsite.com/path' \
-     -H 'user-agent: SMS Forwarder App' \
      -H 'content-type: application/json; charset=utf-8' \
      -d $'{"from":"1234567890","text":"Test"}'
 ```
+
+### Send SMS to the Telegram
+
+1. Create Telegram bot and channel to receive messages. [There](https://bogomolov.tech/Telegram-notification-on-SSH-login/) is short tutorial how to do that.  
+2. Add new forwarding configuration in the app using this parameters:
+   1. Any sender you need, * - on the screenshot
+   2. Webhook URL - https://api.telegram.org/bot<YourBOTToken>/sendMessage?chat_id=<channel_id> - change URL using your token and channel id
+   3. Use this payload as a sample `{"text":"sms from %from% with text: \"%text%\" sent at %sentStamp%"}`
+   4. Save configuration
+
+<img alt="Incoming SMS Webhook Gateway screenshot Telegram example" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/telegram.png" width="30%"/> 
 
 ## Screenshots
 <img alt="Incoming SMS Webhook Gateway screenshot 1" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 2" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 3" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="30%"/>
