@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -97,6 +99,18 @@ public class MainActivity extends AppCompatActivity {
         ListView listview = findViewById(R.id.listView);
 
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
+
+        if (configs.size() > 0) {
+            Context context = getApplicationContext();
+            Intent intent = new Intent(this, SmsReceiverService.class);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent);
+            } else {
+                context.startService(intent);
+            }
+        }
+
         listAdapter = new ListAdapter(configs, context);
 
         listview.setAdapter(listAdapter);

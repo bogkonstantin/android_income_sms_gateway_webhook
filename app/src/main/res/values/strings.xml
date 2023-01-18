@@ -23,4 +23,5 @@
     <string name="asterisk">*</string>
     <string name="any">Any</string>
     <string name="confirm_delete">Do you really want to delete "%s" record?</string>
+    <string name="notification_channel">Default</string>
 </resources>
