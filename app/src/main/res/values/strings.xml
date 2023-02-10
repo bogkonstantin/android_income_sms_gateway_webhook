@@ -13,6 +13,7 @@
     <string name="label_url">Webhook URL</string>
     <string name="label_json_template">Json Payload Template</string>
     <string name="label_json_headers">Headers</string>
+    <string name="label_ignore_ssl">Ignore SSL/TLS certificate errors</string>
     <string name="hint_sender">number or text</string>
     <string name="sender_recommendation">Use * symbol to catch any SMS</string>
     <string name="json_template_recommendation">Available placeholders %text%, %from%, %sentStamp%, %receivedStamp%, %sim%</string>

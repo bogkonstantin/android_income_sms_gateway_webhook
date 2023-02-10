@@ -14,8 +14,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -70,10 +68,15 @@ public class SmsReceiver extends BroadcastReceiver {
                 .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
                 .replaceAll("%sim%", this.detectSim(bundle));
 
-        this.callWebHook(matchedConfig.getUrl(), messageContent, matchedConfig.getHeaders());
+        this.callWebHook(
+                matchedConfig.getUrl(),
+                messageContent,
+                matchedConfig.getHeaders(),
+                matchedConfig.getIgnoreSsl()
+        );
     }
 
-    protected void callWebHook(String url, String message, String headers) {
+    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -83,6 +86,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 .putString(WebHookWorkRequest.DATA_URL, url)
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
                 .putString(WebHookWorkRequest.DATA_HEADERS, headers)
+                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
                 .build();
 
         WorkRequest webhookWorkRequest =

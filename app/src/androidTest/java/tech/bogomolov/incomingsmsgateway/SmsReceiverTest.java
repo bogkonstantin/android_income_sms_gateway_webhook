@@ -31,7 +31,7 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(0))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(1))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(1))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(0))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class SmsReceiverTest {
         Mockito.verify(receiver, Mockito.times(1))
                 .callWebHook(Mockito.anyString(),
                         Mockito.contains("\"text\":\"TestTest\""),
-                        Mockito.anyString());
+                        Mockito.anyString(), Mockito.anyBoolean());
     }
 
     private void setPhoneConfig(Context context, String phone) {
@@ -107,7 +107,7 @@ public class SmsReceiverTest {
         Mockito.doCallRealMethod()
                 .when(receiver).onReceive(Mockito.any(Context.class), Mockito.any(Intent.class));
         Mockito.doNothing().when(receiver)
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
 
         return receiver;
     }

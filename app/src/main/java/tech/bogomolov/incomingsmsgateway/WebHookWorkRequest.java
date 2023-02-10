@@ -1,12 +1,15 @@
 package tech.bogomolov.incomingsmsgateway;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.SSLCertificateSocketFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -20,12 +23,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import javax.net.ssl.HttpsURLConnection;
 
 public class WebHookWorkRequest extends Worker {
 
     public final static String DATA_URL = "URL";
     public final static String DATA_TEXT = "TEXT";
     public final static String DATA_HEADERS = "HEADERS";
+    public final static String DATA_IGNORE_SSL = "IGNORE_SSL";
     public static final int MAX_ATTEMPT = 10;
 
     public static final String RESULT_SUCCESS = "success";
@@ -48,8 +53,9 @@ public class WebHookWorkRequest extends Worker {
         String url = getInputData().getString(DATA_URL);
         String text = getInputData().getString(DATA_TEXT);
         String headers = getInputData().getString(DATA_HEADERS);
+        boolean ignoreSsl = getInputData().getBoolean(DATA_IGNORE_SSL, false);
 
-        String result = this.makeRequest(url, text, headers);
+        String result = this.makeRequest(url, text, headers, ignoreSsl);
 
         if (result.equals(RESULT_RETRY)) {
             return Result.retry();
@@ -62,13 +68,22 @@ public class WebHookWorkRequest extends Worker {
         return Result.success();
     }
 
-    private String makeRequest(String urlString, String text, String headers) {
+    @SuppressLint({"SSLCertificateSocketFactoryGetInsecure", "AllowAllHostnameVerifier"})
+    private String makeRequest(String urlString, String text, String headers, boolean ignoreSsl) {
         String result = RESULT_SUCCESS;
+
         HttpURLConnection urlConnection = null;
 
         try {
             URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
+
+            if (urlConnection instanceof HttpsURLConnection && ignoreSsl) {
+                ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
+                        SSLCertificateSocketFactory.getInsecure(0, null));
+                ((HttpsURLConnection) urlConnection).setHostnameVerifier(new AllowAllHostnameVerifier());
+            }
+
             urlConnection.setDoOutput(true);
             urlConnection.setChunkedStreamingMode(0);
 
@@ -87,7 +102,14 @@ public class WebHookWorkRequest extends Worker {
             }
 
             OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+
+            BufferedWriter writer;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+            } else {
+                writer = new BufferedWriter(new OutputStreamWriter(out));
+            }
+
             writer.write(text);
             writer.flush();
             writer.close();
