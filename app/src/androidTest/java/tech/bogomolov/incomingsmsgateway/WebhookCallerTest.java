@@ -54,6 +54,13 @@ public class WebhookCallerTest {
         assertThat(workInfo.getState(), is(WorkInfo.State.FAILED));
     }
 
+    @Test
+    public void testSelfSignedCert() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo(
+                "https://self-signed.badssl.com/", "test", "{\"User-Agent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36\"}", true);
+        assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
+    }
+
     private WorkInfo getWorkInfo(String url, String text, String headers, boolean ignoreSsl) throws Exception {
         Data input = new Data.Builder()
                 .put(WebHookWorkRequest.DATA_URL, url)
