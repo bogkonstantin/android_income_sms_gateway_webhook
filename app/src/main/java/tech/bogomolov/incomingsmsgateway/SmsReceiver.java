@@ -135,6 +135,9 @@ public class SmsReceiver extends BroadcastReceiver {
                 case "slotIdx":
                     slotId = bundle.getInt("slotIdx", -1);
                     break;
+                case "android.telephony.extra.SLOT_INDEX":
+                    slotId = bundle.getInt("android.telephony.extra.SLOT_INDEX", -1);
+                    break;
                 default:
                     if (key.toLowerCase().contains("slot") | key.toLowerCase().contains("sim")) {
                         String value = bundle.getString(key, "-1");
