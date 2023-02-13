@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
             builder.setPositiveButton(R.string.btn_add, null);
             builder.setNegativeButton(R.string.btn_cancel, null);
             final AlertDialog dialog = builder.show();
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
                 String sender = senderInput.getText().toString();
                 if (TextUtils.isEmpty(sender)) {
