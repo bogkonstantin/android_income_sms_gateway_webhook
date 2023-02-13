@@ -3,12 +3,15 @@ package tech.bogomolov.incomingsmsgateway;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +42,13 @@ public class MainActivityTest {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();
+    }
+
+    @After
+    public void recreateActivity() {
+        ActivityScenario<MainActivity> scenario = activityRule.getScenario();
+        scenario.moveToState(Lifecycle.State.RESUMED);
+        scenario.recreate();
     }
 
     @Test
