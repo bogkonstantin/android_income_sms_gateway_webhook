@@ -1,5 +1,6 @@
 package tech.bogomolov.incomingsmsgateway;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +54,29 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
 
         View deleteButton = row.findViewById(R.id.delete_button);
         deleteButton.setTag(R.id.delete_button, position);
+        deleteButton.setOnClickListener(this::onDeleteClick);
 
         return row;
+    }
+
+    public void onDeleteClick(View view) {
+        ListAdapter listAdapter = this;
+        final int position = (int) view.getTag(R.id.delete_button);
+        final ForwardingConfig config = listAdapter.getItem(position);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle(R.string.delete_record);
+        String asterisk = context.getString(R.string.asterisk);
+        String any = context.getString(R.string.any);
+        String message = context.getString(R.string.confirm_delete);
+        message = String.format(message, (config.getSender().equals(asterisk) ? any : config.getSender()));
+        builder.setMessage(message);
+
+        builder.setPositiveButton(R.string.btn_delete, (dialog, id) -> {
+            listAdapter.remove(config);
+            config.remove();
+        });
+        builder.setNegativeButton(R.string.btn_cancel, null);
+        builder.show();
     }
 }

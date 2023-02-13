@@ -3,13 +3,14 @@ package tech.bogomolov.incomingsmsgateway;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -65,31 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
-
-
-    }
-
-    public void onDeleteClick(View view) {
-        final int position = (int) view.getTag(R.id.delete_button);
-        final ForwardingConfig config = listAdapter.getItem(position);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.delete_record);
-        String asterisk = context.getString(R.string.asterisk);
-        String any = context.getString(R.string.any);
-        String message = context.getString(R.string.confirm_delete);
-        message = String.format(message, (config.getSender().equals(asterisk) ? any : config.getSender()));
-        builder.setMessage(message);
-
-        builder.setPositiveButton(R.string.btn_delete, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                listAdapter.remove(config);
-                config.remove();
-            }
-        });
-        builder.setNegativeButton(R.string.btn_cancel, null);
-        builder.show();
     }
 
     private void showList() {
@@ -100,15 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
 
-        if (configs.size() > 0) {
-            Context context = getApplicationContext();
-            Intent intent = new Intent(this, SmsReceiverService.class);
+        Context appContext = getApplicationContext();
+        Intent intent = new Intent(this, SmsReceiverService.class);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent);
-            } else {
-                context.startService(intent);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            appContext.startForegroundService(intent);
+        } else {
+            appContext.startService(intent);
         }
 
         listAdapter = new ListAdapter(configs, context);
@@ -125,74 +99,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private View.OnClickListener showAddDialog() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
-                final EditText senderInput = view.findViewById(R.id.input_phone);
-                final EditText urlInput = view.findViewById(R.id.input_url);
-                final EditText templateInput = view.findViewById(R.id.input_json_template);
-                final EditText headersInput = view.findViewById(R.id.input_json_headers);
+        return v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
+            final EditText senderInput = view.findViewById(R.id.input_phone);
+            final EditText urlInput = view.findViewById(R.id.input_url);
+            final EditText templateInput = view.findViewById(R.id.input_json_template);
+            final EditText headersInput = view.findViewById(R.id.input_json_headers);
+            final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
 
-                templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
-                headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
+            templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
+            headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
 
-                builder.setView(view);
-                builder.setPositiveButton(R.string.btn_add, null);
-                builder.setNegativeButton(R.string.btn_cancel, null);
-                final AlertDialog dialog = builder.show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String sender = senderInput.getText().toString();
-                        if (TextUtils.isEmpty(sender)) {
-                            senderInput.setError(getString(R.string.error_empty_sender));
-                            return;
-                        }
+            builder.setView(view);
+            builder.setPositiveButton(R.string.btn_add, null);
+            builder.setNegativeButton(R.string.btn_cancel, null);
+            final AlertDialog dialog = builder.show();
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
+                String sender = senderInput.getText().toString();
+                if (TextUtils.isEmpty(sender)) {
+                    senderInput.setError(getString(R.string.error_empty_sender));
+                    return;
+                }
 
-                        String url = urlInput.getText().toString();
-                        if (TextUtils.isEmpty(url)) {
-                            urlInput.setError(getString(R.string.error_empty_url));
-                            return;
-                        }
+                String url = urlInput.getText().toString();
+                if (TextUtils.isEmpty(url)) {
+                    urlInput.setError(getString(R.string.error_empty_url));
+                    return;
+                }
 
-                        try {
-                            new URL(url);
-                        } catch (MalformedURLException e) {
-                            urlInput.setError(getString(R.string.error_wrong_url));
-                            return;
-                        }
+                try {
+                    new URL(url);
+                } catch (MalformedURLException e) {
+                    urlInput.setError(getString(R.string.error_wrong_url));
+                    return;
+                }
 
-                        String template = templateInput.getText().toString();
-                        try {
-                            JSONObject jsonObject = new JSONObject(template);
-                        } catch (JSONException e) {
-                            templateInput.setError(getString(R.string.error_wrong_json));
-                            return;
-                        }
+                String template = templateInput.getText().toString();
+                try {
+                    new JSONObject(template);
+                } catch (JSONException e) {
+                    templateInput.setError(getString(R.string.error_wrong_json));
+                    return;
+                }
 
-                        String headers = headersInput.getText().toString();
-                        try {
-                            JSONObject jsonObject = new JSONObject(headers);
-                        } catch (JSONException e) {
-                            headersInput.setError(getString(R.string.error_wrong_json));
-                            return;
-                        }
+                String headers = headersInput.getText().toString();
+                try {
+                    new JSONObject(headers);
+                } catch (JSONException e) {
+                    headersInput.setError(getString(R.string.error_wrong_json));
+                    return;
+                }
 
-                        ForwardingConfig config = new ForwardingConfig(context);
-                        config.setSender(sender);
-                        config.setUrl(url);
-                        config.setTemplate(template);
-                        config.setHeaders(headers);
-                        config.save();
+                boolean ignoreSsl = ignoreSslCheckbox.isChecked();
 
-                        listAdapter.add(config);
+                ForwardingConfig config = new ForwardingConfig(context);
+                config.setSender(sender);
+                config.setUrl(url);
+                config.setTemplate(template);
+                config.setHeaders(headers);
+                config.setIgnoreSsl(ignoreSsl);
+                config.save();
 
-                        dialog.dismiss();
-                    }
-                });
-            }
+                listAdapter.add(config);
+
+                dialog.dismiss();
+            });
         };
     }
 }

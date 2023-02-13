@@ -16,11 +16,13 @@ public class ForwardingConfig {
     private static final String KEY_URL = "url";
     private static final String KEY_TEMPLATE = "template";
     private static final String KEY_HEADERS = "headers";
+    private static final String KEY_IGNORE_SSL = "ignore_ssl";
 
     private String sender;
     private String url;
     private String template;
     private String headers;
+    private boolean ignoreSsl = false;
 
     public ForwardingConfig(Context context) {
         this.context = context;
@@ -58,12 +60,21 @@ public class ForwardingConfig {
         this.headers = headers;
     }
 
+    public boolean getIgnoreSsl() {
+        return this.ignoreSsl;
+    }
+
+    public void setIgnoreSsl(boolean ignoreSsl) {
+        this.ignoreSsl = ignoreSsl;
+    }
+
     public void save() {
         try {
             JSONObject json = new JSONObject();
             json.put(KEY_URL, this.url);
             json.put(KEY_TEMPLATE, this.template);
             json.put(KEY_HEADERS, this.headers);
+            json.put(KEY_IGNORE_SSL, this.ignoreSsl);
 
             SharedPreferences.Editor editor = getEditor(context);
             editor.putString(this.sender, json.toString());
@@ -100,6 +111,11 @@ public class ForwardingConfig {
                     config.setUrl(json.getString(KEY_URL));
                     config.setTemplate(json.getString(KEY_TEMPLATE));
                     config.setHeaders(json.getString(KEY_HEADERS));
+
+                    try {
+                        config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
+                    } catch (JSONException ignored) {
+                    }
                 } catch (JSONException e) {
                     Log.e("ForwardingConfig", e.getMessage());
                 }

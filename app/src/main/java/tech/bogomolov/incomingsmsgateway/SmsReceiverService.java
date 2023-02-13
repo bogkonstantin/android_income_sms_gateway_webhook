@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Telephony;
 
 import androidx.annotation.Nullable;
 
@@ -27,7 +28,11 @@ public class SmsReceiverService extends Service {
         super.onCreate();
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            filter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        } else {
+            filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        }
 
         registerReceiver(receiver, filter);
 
