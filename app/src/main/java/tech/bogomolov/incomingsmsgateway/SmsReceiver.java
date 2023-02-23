@@ -17,6 +17,9 @@ import androidx.work.WorkRequest;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+
+import org.apache.commons.text.StringEscapeUtils;
 
 public class SmsReceiver extends BroadcastReceiver {
 
@@ -62,12 +65,11 @@ public class SmsReceiver extends BroadcastReceiver {
 
         String messageContent = matchedConfig.getTemplate()
                 .replaceAll("%from%", sender)
-                .replaceAll("%text%",
-                        content.toString().replaceAll("\"", "\\\\\""))
                 .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
                 .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                .replaceAll("%sim%", this.detectSim(bundle));
-
+                .replaceAll("%sim%", this.detectSim(bundle))
+                .replaceAll("%text%",
+                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
         this.callWebHook(
                 matchedConfig.getUrl(),
                 messageContent,
