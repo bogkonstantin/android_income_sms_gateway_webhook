@@ -3,6 +3,7 @@ package tech.bogomolov.incomingsmsgateway;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.SSLCertificateSocketFactory;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -78,10 +79,17 @@ public class WebHookWorkRequest extends Worker {
             URL url = new URL(urlString);
             urlConnection = (HttpURLConnection) url.openConnection();
 
-            if (urlConnection instanceof HttpsURLConnection && ignoreSsl) {
-                ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
-                        SSLCertificateSocketFactory.getInsecure(0, null));
-                ((HttpsURLConnection) urlConnection).setHostnameVerifier(new AllowAllHostnameVerifier());
+            if (urlConnection instanceof HttpsURLConnection) {
+                if (ignoreSsl) {
+                    ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
+                            SSLCertificateSocketFactory.getInsecure(0, null));
+                    ((HttpsURLConnection) urlConnection).setHostnameVerifier(new AllowAllHostnameVerifier());
+                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH
+                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
+                            new TLSSocketFactoryKitKat()
+                    );
+                }
             }
 
             urlConnection.setDoOutput(true);

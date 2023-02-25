@@ -43,6 +43,12 @@ public class WebhookCallerTest {
     }
 
     @Test
+    public void testTlsV1Disables() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo("https://wordpress.com", "test", "{}", false);
+        assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
+    }
+
+    @Test
     public void testHttpSuccess() throws Exception {
         WorkInfo workInfo = this.getWorkInfo("http://example.com", "test", "{}", false);
         assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
