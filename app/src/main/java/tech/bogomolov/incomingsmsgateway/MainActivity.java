@@ -1,6 +1,7 @@
 package tech.bogomolov.incomingsmsgateway;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -76,6 +77,28 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
 
+        listAdapter = new ListAdapter(configs, context);
+        listview.setAdapter(listAdapter);
+
+        FloatingActionButton fab = findViewById(R.id.btn_add);
+        fab.setOnClickListener(this.showAddDialog());
+
+        if (!this.isServiceRunning()) {
+            this.startService();
+        }
+    }
+
+    private boolean isServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if(tech.bogomolov.incomingsmsgateway.SmsReceiverService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void startService() {
         Context appContext = getApplicationContext();
         Intent intent = new Intent(this, SmsReceiverService.class);
 
@@ -84,13 +107,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             appContext.startService(intent);
         }
-
-        listAdapter = new ListAdapter(configs, context);
-
-        listview.setAdapter(listAdapter);
-
-        FloatingActionButton fab = findViewById(R.id.btn_add);
-        fab.setOnClickListener(this.showAddDialog());
     }
 
     private void showInfo(String text) {

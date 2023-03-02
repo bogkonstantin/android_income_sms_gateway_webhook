@@ -1,4 +1,8 @@
-package tech.bogomolov.incomingsmsgateway;
+package tech.bogomolov.incomingsmsgateway.SSLSocketFactory;
+
+import android.annotation.SuppressLint;
+import android.net.SSLCertificateSocketFactory;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -10,14 +14,19 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-public class TLSSocketFactoryKitKat extends SSLSocketFactory {
+public class TLSSocketFactory extends SSLSocketFactory {
 
     private final SSLSocketFactory factory;
 
-    public TLSSocketFactoryKitKat() throws KeyManagementException, NoSuchAlgorithmException {
-        SSLContext context = SSLContext.getInstance("TLS");
-        context.init(null, null, null);
-        factory = context.getSocketFactory();
+    @SuppressLint("SSLCertificateSocketFactoryGetInsecure")
+    public TLSSocketFactory(boolean ignoreSsl) throws KeyManagementException, NoSuchAlgorithmException {
+        if (ignoreSsl) {
+            factory = SSLCertificateSocketFactory.getInsecure(0, null);
+        } else {
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, null, null);
+            factory = context.getSocketFactory();
+        }
     }
 
     @Override
@@ -62,7 +71,8 @@ public class TLSSocketFactoryKitKat extends SSLSocketFactory {
 
     private Socket enableTLSOnSocket(Socket socket) {
         if((socket instanceof SSLSocket)) {
-            ((SSLSocket)socket).setEnabledProtocols(new String[] {"TLSv1.1", "TLSv1.2"});
+            String[] supportedProtocols = ((SSLSocket)socket).getSupportedProtocols();
+            ((SSLSocket)socket).setEnabledProtocols(supportedProtocols);
         }
         return socket;
     }

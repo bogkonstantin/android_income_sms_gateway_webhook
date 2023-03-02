@@ -43,8 +43,14 @@ public class WebhookCallerTest {
     }
 
     @Test
-    public void testTlsV1Disables() throws Exception {
+    public void testTlsV1Disabled() throws Exception {
         WorkInfo workInfo = this.getWorkInfo("https://wordpress.com", "test", "{}", false);
+        assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
+    }
+
+    @Test
+    public void testTlsV1DisabledSslIgnore() throws Exception {
+        WorkInfo workInfo = this.getWorkInfo("https://wordpress.com", "test", "{}", true);
         assertThat(workInfo.getState(), is(WorkInfo.State.SUCCEEDED));
     }
 

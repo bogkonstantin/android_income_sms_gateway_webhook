@@ -24,7 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+
 import javax.net.ssl.HttpsURLConnection;
+
+import tech.bogomolov.incomingsmsgateway.SSLSocketFactory.TLSSocketFactory;
 
 public class WebHookWorkRequest extends Worker {
 
@@ -69,9 +72,11 @@ public class WebHookWorkRequest extends Worker {
         return Result.success();
     }
 
-    @SuppressLint({"SSLCertificateSocketFactoryGetInsecure", "AllowAllHostnameVerifier"})
+    @SuppressLint({"AllowAllHostnameVerifier"})
     private String makeRequest(String urlString, String text, String headers, boolean ignoreSsl) {
         String result = RESULT_SUCCESS;
+
+        Log.i("SmsGateway", "request " + urlString);
 
         HttpURLConnection urlConnection = null;
 
@@ -80,15 +85,12 @@ public class WebHookWorkRequest extends Worker {
             urlConnection = (HttpURLConnection) url.openConnection();
 
             if (urlConnection instanceof HttpsURLConnection) {
+                ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
+                        new TLSSocketFactory(ignoreSsl)
+                );
+
                 if (ignoreSsl) {
-                    ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
-                            SSLCertificateSocketFactory.getInsecure(0, null));
                     ((HttpsURLConnection) urlConnection).setHostnameVerifier(new AllowAllHostnameVerifier());
-                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH
-                        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    ((HttpsURLConnection) urlConnection).setSSLSocketFactory(
-                            new TLSSocketFactoryKitKat()
-                    );
                 }
             }
 
