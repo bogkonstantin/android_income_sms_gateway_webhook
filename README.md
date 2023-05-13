@@ -1,7 +1,7 @@
 # Incoming SMS to URL forwarder
 
-<img src="https://www.google-analytics.com/collect?v=2&tid=G-VH45K20C6X&cid=555&t=event&en=openPage">
 Try my new Android App - [Easy Expense Tracker](https://play.google.com/store/apps/details?id=tech.bogomolov.budget)
+<img src="https://www.google-analytics.com/collect?v=2&tid=G-VH45K20C6X&cid=555&t=event&en=openPage">
 
 ## How to use
 
