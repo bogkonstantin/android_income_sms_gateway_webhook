@@ -1,6 +1,6 @@
 # Incoming SMS to URL forwarder
 
-<a href="https://www.buymeacoffee.com/bogkonstantin" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<img src="https://www.google-analytics.com/collect?v=2&tid=G-VH45K20C6X&cid=555&t=event&en=openPage">
 
 ## How to use
 
