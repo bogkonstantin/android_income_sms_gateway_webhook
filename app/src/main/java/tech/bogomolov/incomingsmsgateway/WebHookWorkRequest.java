@@ -95,7 +95,7 @@ public class WebHookWorkRequest extends Worker {
             }
 
             urlConnection.setDoOutput(true);
-            urlConnection.setChunkedStreamingMode(0);
+            urlConnection.setFixedLengthStreamingMode(text.length());
 
             urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
