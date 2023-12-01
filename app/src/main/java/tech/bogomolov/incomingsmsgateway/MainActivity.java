@@ -47,8 +47,22 @@ public class MainActivity extends AppCompatActivity {
         } else {
             showList();
         }
+        Thread.setDefaultUncaughtExceptionHandler(
+                new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    public void uncaughtException (Thread thread, Throwable e) {
+                        handleUncaughtException (thread, e);
+                    }
+                });
     }
+    private void handleUncaughtException (Thread thread, Throwable e) {
 
+        // The following shows what I'd like, though it won't work like this.
+        Intent intent = new Intent (getApplicationContext(),MainActivity.class);
+        startActivity(intent);
+
+        // Add some code logic if needed based on your requirement
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != PERMISSION_CODE) {
