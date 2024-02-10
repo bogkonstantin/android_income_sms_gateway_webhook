@@ -56,6 +56,10 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         deleteButton.setTag(R.id.delete_button, position);
         deleteButton.setOnClickListener(this::onDeleteClick);
 
+        View editButton = row.findViewById(R.id.edit_button);
+        editButton.setTag(R.id.edit_button, position);
+        editButton.setOnClickListener(this::onEditClick);
+
         return row;
     }
 
@@ -78,5 +82,12 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         });
         builder.setNegativeButton(R.string.btn_cancel, null);
         builder.show();
+    }
+
+    public void onEditClick(View view) {
+        final int position = (int) view.getTag(R.id.edit_button);
+        final ForwardingConfig config = getItem(position);
+        final MainActivity activity = (MainActivity) context;
+        activity.showEditDialog(config);
     }
 }
