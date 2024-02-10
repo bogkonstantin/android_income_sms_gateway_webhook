@@ -14,7 +14,10 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -51,31 +54,27 @@ public class SmsReceiver extends BroadcastReceiver {
 
         String sender = messages[0].getOriginatingAddress();
 
-        ForwardingConfig matchedConfig = null;
         for (ForwardingConfig config : configs) {
             if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
-                matchedConfig = config;
-                break;
-            }
-        }
+                ForwardingConfig matchedConfig = config;
 
-        if (matchedConfig == null) {
-            return;
-        }
-
-        String messageContent = matchedConfig.getTemplate()
+                String messageContent = matchedConfig.getTemplate()
                 .replaceAll("%from%", sender)
                 .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
+                .replaceAll("%sentStampFmt%", getFormattedDateTime(messages[0].getTimestampMillis()))
                 .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                .replaceAll("%receivedStampFmt%", getFormattedDateTime(System.currentTimeMillis()))
                 .replaceAll("%sim%", this.detectSim(bundle))
                 .replaceAll("%text%",
                         Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
-        this.callWebHook(
-                matchedConfig.getUrl(),
-                messageContent,
-                matchedConfig.getHeaders(),
-                matchedConfig.getIgnoreSsl()
-        );
+                this.callWebHook(
+                        matchedConfig.getUrl(),
+                        messageContent,
+                        matchedConfig.getHeaders(),
+                        matchedConfig.getIgnoreSsl()
+                );
+            }
+        }
     }
 
     protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {
@@ -161,5 +160,10 @@ public class SmsReceiver extends BroadcastReceiver {
         } else {
             return "undetected";
         }
+    }
+
+    private String getFormattedDateTime(long millis) {
+        DateFormat dateTimeFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, Locale.getDefault());
+        return dateTimeFormat.format(new Date(millis));
     }
 }

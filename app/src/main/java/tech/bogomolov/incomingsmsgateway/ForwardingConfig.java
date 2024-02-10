@@ -9,15 +9,18 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 
 public class ForwardingConfig {
     final private Context context;
 
+    private static final String KEY_SENDER = "sender";
     private static final String KEY_URL = "url";
     private static final String KEY_TEMPLATE = "template";
     private static final String KEY_HEADERS = "headers";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
 
+    private String id;
     private String sender;
     private String url;
     private String template;
@@ -26,7 +29,17 @@ public class ForwardingConfig {
 
     public ForwardingConfig(Context context) {
         this.context = context;
+        this.id = UUID.randomUUID().toString();
     }
+
+    public ForwardingConfig(Context context, String id) {
+        this.context = context;
+        this.id = id;
+    }
+
+    public String getId() { return this.id; }
+
+    public void setId(String id) { this.id = id; }
 
     public String getSender() {
         return this.sender;
@@ -71,13 +84,14 @@ public class ForwardingConfig {
     public void save() {
         try {
             JSONObject json = new JSONObject();
+            json.put(KEY_SENDER, this.sender);
             json.put(KEY_URL, this.url);
             json.put(KEY_TEMPLATE, this.template);
             json.put(KEY_HEADERS, this.headers);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
 
             SharedPreferences.Editor editor = getEditor(context);
-            editor.putString(this.sender, json.toString());
+            editor.putString(this.id, json.toString());
 
             editor.commit();
         } catch (Exception e) {
@@ -100,29 +114,25 @@ public class ForwardingConfig {
         ArrayList<ForwardingConfig> configs = new ArrayList<>();
 
         for (Map.Entry<String, ?> entry : sharedPrefs.entrySet()) {
-            ForwardingConfig config = new ForwardingConfig(context);
-            config.setSender(entry.getKey());
-
             String value = (String) entry.getValue();
 
-            if (value.charAt(0) == '{') {
-                try {
-                    JSONObject json = new JSONObject(value);
-                    config.setUrl(json.getString(KEY_URL));
-                    config.setTemplate(json.getString(KEY_TEMPLATE));
-                    config.setHeaders(json.getString(KEY_HEADERS));
+            if (value.charAt(0) != '{') continue;
 
-                    try {
-                        config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
-                    } catch (JSONException ignored) {
-                    }
-                } catch (JSONException e) {
-                    Log.e("ForwardingConfig", e.getMessage());
+            ForwardingConfig config = new ForwardingConfig(context, entry.getKey());
+
+            try {
+                JSONObject json = new JSONObject(value);
+                config.setSender(json.getString(KEY_SENDER));
+                config.setUrl(json.getString(KEY_URL));
+                config.setTemplate(json.getString(KEY_TEMPLATE));
+                config.setHeaders(json.getString(KEY_HEADERS));
+
+                try {
+                    config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
+                } catch (JSONException ignored) {
                 }
-            } else {
-                config.setUrl(value);
-                config.setTemplate(ForwardingConfig.getDefaultJsonTemplate());
-                config.setHeaders(ForwardingConfig.getDefaultJsonHeaders());
+            } catch (JSONException e) {
+                Log.e("ForwardingConfig", e.getMessage());
             }
 
             configs.add(config);
@@ -133,7 +143,7 @@ public class ForwardingConfig {
 
     public void remove() {
         SharedPreferences.Editor editor = getEditor(context);
-        editor.remove(this.getSender());
+        editor.remove(this.getId());
         editor.commit();
     }
 
