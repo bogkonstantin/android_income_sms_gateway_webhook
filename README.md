@@ -1,7 +1,5 @@
 # Incoming SMS to URL forwarder
 
-Try my new Android App - [Easy Expense Tracker](https://play.google.com/store/apps/details?id=tech.bogomolov.budget)
-
 ## How to use
 
 Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed and "Display pop-up windows while running in the background" from Xiaomi devices.
@@ -77,3 +75,5 @@ Or download it from F-Droid
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
+
+This repository contains a stable app with minimum functionality. It is not archived, but not actively developing. If you need an app with merged PRs - try [this fork](https://github.com/scottmconway/android_income_sms_gateway_webhook)
