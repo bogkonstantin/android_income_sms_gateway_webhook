@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.json.JSONObject;
 
 public class SmsReceiver extends BroadcastReceiver {
 
@@ -63,13 +63,17 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
+        // Use org.json.JSONObject.quote to properly escape the message string
+        // then remove the quotes it prepends/appends to the string
+        String escapedMessageText = JSONObject.quote(content.toString());
+        escapedMessageText = escapedMessageText.substring(1, escapedMessageText.length() - 1);
+
         String messageContent = matchedConfig.getTemplate()
                 .replaceAll("%from%", sender)
                 .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
                 .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
                 .replaceAll("%sim%", this.detectSim(bundle))
-                .replaceAll("%text%",
-                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
+                .replaceAll("%text%", escapedMessageText);
         this.callWebHook(
                 matchedConfig.getUrl(),
                 messageContent,
