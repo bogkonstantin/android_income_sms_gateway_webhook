@@ -1,11 +1,17 @@
 package tech.bogomolov.incomingsmsgateway;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 
+import androidx.core.content.ContextCompat;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -49,11 +55,26 @@ public class SmsReceiver extends BroadcastReceiver {
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
         String asterisk = context.getString(R.string.asterisk);
 
-        String sender = messages[0].getOriginatingAddress();
+        String senderPhoneNumber = messages[0].getOriginatingAddress();
+        String senderName = null;
+        // Attempt to resolve sender name if `READ_CONTACTS` permission has been granted
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                senderName = getContactNameByPhoneNumber(senderPhoneNumber, context);
+            }
+            catch (java.lang.SecurityException se) {
+                // READ_CONTACTS hasn't been granted, but we shouldn't've gotten here...
+                assert true;
+            }
+        }
+
+        if (senderName == null) {
+            senderName = senderPhoneNumber;     // fallback to phone number
+        }
 
         ForwardingConfig matchedConfig = null;
         for (ForwardingConfig config : configs) {
-            if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
+            if (senderPhoneNumber.equals(config.getSender()) || config.getSender().equals(asterisk)) {
                 matchedConfig = config;
                 break;
             }
@@ -64,10 +85,16 @@ public class SmsReceiver extends BroadcastReceiver {
         }
 
         String messageContent = matchedConfig.getTemplate()
-                .replaceAll("%from%", sender)
+                .replaceAll("%from%", senderPhoneNumber)
                 .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
                 .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
                 .replaceAll("%sim%", this.detectSim(bundle))
+                // TODO since both `fromName` and `text` can contain arbitrary characters,
+                // the latter replacement can overwrite text in the former
+                //
+                // Solution - don't name contacts with the substring `%text%` in them
+                .replaceAll("%fromName%",
+                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(senderName.toString())))
                 .replaceAll("%text%",
                         Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
         this.callWebHook(
@@ -161,5 +188,22 @@ public class SmsReceiver extends BroadcastReceiver {
         } else {
             return "undetected";
         }
+    }
+
+    private String getContactNameByPhoneNumber(String phoneNumber, Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        String contactName = null;
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int nameIndex = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME);
+            contactName = cursor.getString(nameIndex);
+            cursor.close();
+        }
+
+        return contactName;
     }
 }
