@@ -3,6 +3,8 @@
     <string name="permission_needed">Set permission to access SMS to use this app.</string>
     <string name="input_phone">66123456789</string>
     <string name="input_url">https://example.com</string>
+    <string name="label_advanced">Advanced parameters</string>
+    <string name="label_routing_params">Routing parameters</string>
     <string name="btn_add">Add</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
