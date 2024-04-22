@@ -78,18 +78,41 @@
         android:layout_height="wrap_content"
         tools:ignore="RtlSymmetry">
 
-        <Button
-            android:id="@+id/delete_button"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:height="10dp"
-            android:minHeight="32dp"
-            android:text="@string/btn_delete"
-            android:textAllCaps="true"
-            android:textColor="@color/colorDanger"
-            android:textSize="14sp" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/edit_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:height="10dp"
+                android:minHeight="32dp"
+                android:text="@string/btn_edit"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/delete_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:height="10dp"
+                android:minHeight="32dp"
+                android:text="@string/btn_delete"
+                android:textAllCaps="true"
+                android:textColor="@color/colorDanger"
+                android:textSize="14sp" />
+
+        </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

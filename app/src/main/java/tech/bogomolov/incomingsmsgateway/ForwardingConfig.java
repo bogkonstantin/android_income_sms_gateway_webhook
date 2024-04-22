@@ -9,23 +9,37 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 public class ForwardingConfig {
     final private Context context;
 
+    private static final String KEY_KEY = "key";
+    private static final String KEY_SENDER = "sender";
     private static final String KEY_URL = "url";
     private static final String KEY_TEMPLATE = "template";
     private static final String KEY_HEADERS = "headers";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
+    private static final String KEY_IS_SMS_ENABLED = "is_sms_enabled";
 
+    private String key;
     private String sender;
     private String url;
     private String template;
     private String headers;
     private boolean ignoreSsl = false;
+    private boolean isSmsEnabled = true;
 
     public ForwardingConfig(Context context) {
         this.context = context;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return this.key;
     }
 
     public String getSender() {
@@ -68,16 +82,31 @@ public class ForwardingConfig {
         this.ignoreSsl = ignoreSsl;
     }
 
+    public boolean getIsSmsEnabled() {
+        return this.isSmsEnabled;
+    }
+
+    public void setIsSmsEnabled(boolean isSmsEnabled) {
+        this.isSmsEnabled = isSmsEnabled;
+    }
+
     public void save() {
         try {
+            if (this.getKey() == null) {
+                this.setKey(this.generateKey());
+            }
+
             JSONObject json = new JSONObject();
+            json.put(KEY_KEY, this.getKey());
+            json.put(KEY_SENDER, this.sender);
             json.put(KEY_URL, this.url);
             json.put(KEY_TEMPLATE, this.template);
             json.put(KEY_HEADERS, this.headers);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
+            json.put(KEY_IS_SMS_ENABLED, this.isSmsEnabled);
 
             SharedPreferences.Editor editor = getEditor(context);
-            editor.putString(this.sender, json.toString());
+            editor.putString(this.getKey(), json.toString());
 
             editor.commit();
         } catch (Exception e) {
@@ -108,6 +137,25 @@ public class ForwardingConfig {
             if (value.charAt(0) == '{') {
                 try {
                     JSONObject json = new JSONObject(value);
+
+                    if (!json.has(KEY_KEY)) {
+                        config.setKey(entry.getKey());
+                    } else {
+                        config.setKey(json.getString(KEY_KEY));
+                    }
+
+                    if (!json.has(KEY_SENDER)) {
+                        config.setSender(entry.getKey());
+                    } else {
+                        config.setSender(json.getString(KEY_SENDER));
+                    }
+
+                    if (!json.has(KEY_IS_SMS_ENABLED)) {
+                        config.setIsSmsEnabled(true);
+                    } else {
+                        config.setIsSmsEnabled(json.getBoolean(KEY_IS_SMS_ENABLED));
+                    }
+
                     config.setUrl(json.getString(KEY_URL));
                     config.setTemplate(json.getString(KEY_TEMPLATE));
                     config.setHeaders(json.getString(KEY_HEADERS));
@@ -133,7 +181,7 @@ public class ForwardingConfig {
 
     public void remove() {
         SharedPreferences.Editor editor = getEditor(context);
-        editor.remove(this.getSender());
+        editor.remove(this.getKey());
         editor.commit();
     }
 
@@ -147,5 +195,11 @@ public class ForwardingConfig {
     private static SharedPreferences.Editor getEditor(Context context) {
         SharedPreferences sharedPref = getPreference(context);
         return sharedPref.edit();
+    }
+
+    private String generateKey() {
+        String stamp = Long.toString(System.currentTimeMillis());
+        int randomNum = new Random().nextInt((999990 - 100000) + 1) + 100000;
+        return stamp + '_' + randomNum;
     }
 }

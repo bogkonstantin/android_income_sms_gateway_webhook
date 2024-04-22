@@ -50,32 +50,33 @@ public class SmsReceiver extends BroadcastReceiver {
         String asterisk = context.getString(R.string.asterisk);
 
         String sender = messages[0].getOriginatingAddress();
-
-        ForwardingConfig matchedConfig = null;
-        for (ForwardingConfig config : configs) {
-            if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
-                matchedConfig = config;
-                break;
-            }
-        }
-
-        if (matchedConfig == null) {
+        if (sender == null) {
             return;
         }
 
-        String messageContent = matchedConfig.getTemplate()
-                .replaceAll("%from%", sender)
-                .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
-                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                .replaceAll("%sim%", this.detectSim(bundle))
-                .replaceAll("%text%",
-                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
-        this.callWebHook(
-                matchedConfig.getUrl(),
-                messageContent,
-                matchedConfig.getHeaders(),
-                matchedConfig.getIgnoreSsl()
-        );
+        for (ForwardingConfig config : configs) {
+            if (!sender.equals(config.getSender()) && !config.getSender().equals(asterisk)) {
+                continue;
+            }
+
+            if (!config.getIsSmsEnabled()) {
+                continue;
+            }
+
+            String messageContent = config.getTemplate()
+                    .replaceAll("%from%", sender)
+                    .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
+                    .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                    .replaceAll("%sim%", this.detectSim(bundle))
+                    .replaceAll("%text%",
+                            Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
+            this.callWebHook(
+                    config.getUrl(),
+                    messageContent,
+                    config.getHeaders(),
+                    config.getIgnoreSsl()
+            );
+        }
     }
 
     protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {

@@ -52,11 +52,28 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         TextView headers = row.findViewById(R.id.text_headers);
         headers.setText(config.getHeaders());
 
+        View editButton = row.findViewById(R.id.edit_button);
+        editButton.setTag(R.id.edit_button, position);
+        editButton.setOnClickListener(this::onEditClick);
+
         View deleteButton = row.findViewById(R.id.delete_button);
         deleteButton.setTag(R.id.delete_button, position);
         deleteButton.setOnClickListener(this::onDeleteClick);
 
         return row;
+    }
+
+    public void onEditClick(View view) {
+        ListAdapter listAdapter = this;
+        final int position = (int) view.getTag(R.id.edit_button);
+        final ForwardingConfig config = listAdapter.getItem(position);
+
+        ForwardingConfigDialog.showEditDialog(
+                config,
+                context,
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE),
+                listAdapter
+        );
     }
 
     public void onDeleteClick(View view) {
