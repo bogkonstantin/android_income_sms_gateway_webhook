@@ -17,6 +17,7 @@ public class ForwardingConfig {
     private static final String KEY_KEY = "key";
     private static final String KEY_SENDER = "sender";
     private static final String KEY_URL = "url";
+    private static final String KEY_SIM_SLOT = "sim_slot";
     private static final String KEY_TEMPLATE = "template";
     private static final String KEY_HEADERS = "headers";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
@@ -25,6 +26,7 @@ public class ForwardingConfig {
     private String key;
     private String sender;
     private String url;
+    private int simSlot = 0; // 0 means any
     private String template;
     private String headers;
     private boolean ignoreSsl = false;
@@ -56,6 +58,14 @@ public class ForwardingConfig {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getSimSlot() {
+        return this.simSlot;
+    }
+
+    public void setSimSlot(int simSlot) {
+        this.simSlot = simSlot;
     }
 
     public String getTemplate() {
@@ -90,6 +100,14 @@ public class ForwardingConfig {
         this.isSmsEnabled = isSmsEnabled;
     }
 
+    public static String getDefaultJsonTemplate() {
+        return "{\n  \"from\":\"%from%\",\n  \"text\":\"%text%\",\n  \"sentStamp\":%sentStamp%,\n  \"receivedStamp\":%receivedStamp%,\n  \"sim\":\"%sim%\"\n}";
+    }
+
+    public static String getDefaultJsonHeaders() {
+        return "{\"User-agent\":\"SMS Forwarder App\"}";
+    }
+
     public void save() {
         try {
             if (this.getKey() == null) {
@@ -100,6 +118,7 @@ public class ForwardingConfig {
             json.put(KEY_KEY, this.getKey());
             json.put(KEY_SENDER, this.sender);
             json.put(KEY_URL, this.url);
+            json.put(KEY_SIM_SLOT, this.simSlot);
             json.put(KEY_TEMPLATE, this.template);
             json.put(KEY_HEADERS, this.headers);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
@@ -112,14 +131,6 @@ public class ForwardingConfig {
         } catch (Exception e) {
             Log.e("ForwardingConfig", e.getMessage());
         }
-    }
-
-    public static String getDefaultJsonTemplate() {
-        return "{\n  \"from\":\"%from%\",\n  \"text\":\"%text%\",\n  \"sentStamp\":%sentStamp%,\n  \"receivedStamp\":%receivedStamp%,\n  \"sim\":\"%sim%\"\n}";
-    }
-
-    public static String getDefaultJsonHeaders() {
-        return "{\"User-agent\":\"SMS Forwarder App\"}";
     }
 
     public static ArrayList<ForwardingConfig> getAll(Context context) {
@@ -154,6 +165,10 @@ public class ForwardingConfig {
                         config.setIsSmsEnabled(true);
                     } else {
                         config.setIsSmsEnabled(json.getBoolean(KEY_IS_SMS_ENABLED));
+                    }
+
+                    if (json.has(KEY_SIM_SLOT)) {
+                        config.setSimSlot(json.getInt(KEY_SIM_SLOT));
                     }
 
                     config.setUrl(json.getString(KEY_URL));

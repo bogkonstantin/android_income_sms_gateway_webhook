@@ -84,6 +84,26 @@
             android:text="@string/label_advanced" />
 
         <TextView
+            android:id="@+id/input_sim_slot_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:visibility="gone"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="16dp"
+            android:labelFor="@+id/input_sim_slot"
+            android:text="@string/label_sim_slot" />
+
+        <Spinner
+            android:id="@+id/input_sim_slot"
+            android:layout_width="fill_parent"
+            android:visibility="gone"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:popupTheme="@style/AppTheme.Spinner"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

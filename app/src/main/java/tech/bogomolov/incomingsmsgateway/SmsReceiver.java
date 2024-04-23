@@ -63,11 +63,25 @@ public class SmsReceiver extends BroadcastReceiver {
                 continue;
             }
 
+            int slotId = this.detectSim(bundle) + 1;
+            String slotName = "undetected";
+            if (slotId < 0) {
+                slotId = 0;
+            }
+
+            if (config.getSimSlot() > 0 && config.getSimSlot() != slotId) {
+                continue;
+            }
+
+            if (slotId > 0) {
+                slotName = "sim" + slotId;
+            }
+
             String messageContent = config.getTemplate()
                     .replaceAll("%from%", sender)
                     .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
                     .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                    .replaceAll("%sim%", this.detectSim(bundle))
+                    .replaceAll("%sim%", slotName)
                     .replaceAll("%text%",
                             Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
             this.callWebHook(
@@ -109,7 +123,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
     }
 
-    private String detectSim(Bundle bundle) {
+    private int detectSim(Bundle bundle) {
         int slotId = -1;
         Set<String> keySet = bundle.keySet();
         for (String key : keySet) {
@@ -155,12 +169,6 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         }
 
-        if (slotId == 0) {
-            return "sim1";
-        } else if (slotId == 1) {
-            return "sim2";
-        } else {
-            return "undetected";
-        }
+        return slotId;
     }
 }

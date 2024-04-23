@@ -2,12 +2,15 @@ package tech.bogomolov.incomingsmsgateway;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.telephony.SubscriptionManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,11 +28,12 @@ public class ForwardingConfigDialog {
         View view = layoutInflater.inflate(R.layout.dialog_add, null);
 
         final EditText templateInput = view.findViewById(R.id.input_json_template);
-        final EditText headersInput = view.findViewById(R.id.input_json_headers);
-        final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
-
         templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
+
+        final EditText headersInput = view.findViewById(R.id.input_json_headers);
         headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
+
+        prepareSimSelector(context, view, 0);
 
         builder.setView(view);
         builder.setPositiveButton(R.string.btn_add, null);
@@ -67,7 +71,7 @@ public class ForwardingConfigDialog {
         final EditText urlInput = view.findViewById(R.id.input_url);
         urlInput.setText(config.getUrl());
 
-
+        prepareSimSelector(context, view, config.getSimSlot());
 
         final EditText templateInput = view.findViewById(R.id.input_json_template);
         templateInput.setText(config.getTemplate());
@@ -118,6 +122,10 @@ public class ForwardingConfigDialog {
             return null;
         }
 
+        Spinner simSlotSelector = (Spinner) view.findViewById(R.id.input_sim_slot);
+        int simSlot = (int) simSlotSelector.getSelectedItemId();
+        config.setSimSlot(simSlot);
+
         final EditText templateInput = view.findViewById(R.id.input_json_template);
         String template = templateInput.getText().toString();
         try {
@@ -147,5 +155,35 @@ public class ForwardingConfigDialog {
         config.save();
 
         return config;
+    }
+
+    private static void prepareSimSelector(Context context, View view, int selected) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            SubscriptionManager subscriptionManager =
+                    (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+            int simSlots = subscriptionManager.getActiveSubscriptionInfoCountMax();
+            if (simSlots > 1) {
+                View label = view.findViewById(R.id.input_sim_slot_label);
+                label.setVisibility(View.VISIBLE);
+
+                Spinner simSlotSelector = (Spinner) view.findViewById(R.id.input_sim_slot);
+                simSlotSelector.setVisibility(View.VISIBLE);
+
+                String[] items = new String[simSlots + 1];
+                items[0] = "any";
+                for (int i = 1; i <= simSlots; i++) {
+                    items[i] = "sim" + i;
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                        android.R.layout.simple_spinner_item, items);
+                simSlotSelector.setAdapter(adapter);
+
+                if (selected > simSlots || selected < 0) {
+                    selected = 0;
+                }
+
+                simSlotSelector.setSelection(selected);
+            }
+        }
     }
 }
