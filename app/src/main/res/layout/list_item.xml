@@ -11,20 +11,68 @@
     android:paddingBottom="8dp"
     tools:ignore="RtlSymmetry">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/label_sender"
-        android:textSize="12sp" />
+        android:orientation="horizontal"
+        >
 
-    <TextView
-        android:id="@+id/text_sender"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#000"
-        android:textSize="18sp"
-        tools:ignore="RtlSymmetry" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/label_sender"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/text_sender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:textSize="18sp"
+                tools:ignore="RtlSymmetry" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/text_sms_on_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/btn_on"
+                    android:textColor="#000"
+                    android:textSize="14sp"
+                    tools:ignore="RtlSymmetry" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_sms_on_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:checked="true"
+                    android:switchMinWidth="56dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"

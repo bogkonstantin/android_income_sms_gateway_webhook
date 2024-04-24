@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SwitchCompat;
+
 import java.util.ArrayList;
 
 public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
@@ -51,6 +53,27 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
 
         TextView headers = row.findViewById(R.id.text_headers);
         headers.setText(config.getHeaders());
+
+        SwitchCompat switchSmsOnOff = row.findViewById(R.id.switch_sms_on_off);
+        TextView switchSmsLabel = row.findViewById(R.id.text_sms_on_off);
+        if (config.getIsSmsEnabled()) {
+            switchSmsOnOff.setChecked(true);
+            switchSmsLabel.setText(R.string.btn_on);
+        } else {
+            switchSmsOnOff.setChecked(false);
+            switchSmsLabel.setText(R.string.btn_off);
+        }
+
+        switchSmsOnOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                config.setIsSmsEnabled(true);
+                switchSmsLabel.setText(R.string.btn_on);
+            } else {
+                config.setIsSmsEnabled(false);
+                switchSmsLabel.setText(R.string.btn_off);
+            }
+            config.save();
+        });
 
         View editButton = row.findViewById(R.id.edit_button);
         editButton.setTag(R.id.edit_button, position);
