@@ -13,6 +13,7 @@
     <string name="delete_record">Delete record</string>
     <string name="key_phones_preference">phones</string>
     <string name="label_add_sender">Sender (number or text)</string>
+    <string name="label_number_retries">Number of retries</string>
     <string name="label_sender">Sender</string>
     <string name="label_url">Webhook URL</string>
     <string name="label_json_template">Json Payload Template</string>
@@ -26,6 +27,7 @@
     <string name="error_empty_url">Empty URL</string>
     <string name="error_wrong_url">Wrong URL</string>
     <string name="error_wrong_json">Not a valid JSON object</string>
+    <string name="error_wrong_retries_number">Should be more than 0</string>
     <string name="asterisk">*</string>
     <string name="any">Any</string>
     <string name="confirm_delete">Do you really want to delete "%s" record?</string>

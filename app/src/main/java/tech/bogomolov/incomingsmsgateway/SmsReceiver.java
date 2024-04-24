@@ -88,12 +88,13 @@ public class SmsReceiver extends BroadcastReceiver {
                     config.getUrl(),
                     messageContent,
                     config.getHeaders(),
-                    config.getIgnoreSsl()
+                    config.getIgnoreSsl(),
+                    config.getRetriesNumber()
             );
         }
     }
 
-    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {
+    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl, int maxRetries) {
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -104,6 +105,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
                 .putString(WebHookWorkRequest.DATA_HEADERS, headers)
                 .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
+                .putInt(WebHookWorkRequest.DATA_MAX_RETRIES, maxRetries)
                 .build();
 
         WorkRequest webhookWorkRequest =

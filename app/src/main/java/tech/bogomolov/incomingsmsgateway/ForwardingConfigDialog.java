@@ -33,6 +33,9 @@ public class ForwardingConfigDialog {
         final EditText headersInput = view.findViewById(R.id.input_json_headers);
         headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
 
+        final EditText retriesNumInput = view.findViewById(R.id.input_number_retries);
+        retriesNumInput.setText(String.valueOf(ForwardingConfig.getDefaultRetriesNumber()));
+
         prepareSimSelector(context, view, 0);
 
         builder.setView(view);
@@ -78,6 +81,9 @@ public class ForwardingConfigDialog {
 
         final EditText headersInput = view.findViewById(R.id.input_json_headers);
         headersInput.setText(config.getHeaders());
+
+        final EditText retriesNumInput = view.findViewById(R.id.input_number_retries);
+        retriesNumInput.setText(String.valueOf(config.getRetriesNumber()));
 
         final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
         ignoreSslCheckbox.setChecked(config.getIgnoreSsl());
@@ -144,6 +150,13 @@ public class ForwardingConfigDialog {
             return null;
         }
 
+        final EditText retriesNumInput = view.findViewById(R.id.input_number_retries);
+        int retriesNum = Integer.parseInt(retriesNumInput.getText().toString());
+        if (retriesNum < 0) {
+            retriesNumInput.setError(context.getString(R.string.error_wrong_retries_number));
+            return null;
+        }
+
         final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
         boolean ignoreSsl = ignoreSslCheckbox.isChecked();
 
@@ -151,6 +164,7 @@ public class ForwardingConfigDialog {
         config.setUrl(url);
         config.setTemplate(template);
         config.setHeaders(headers);
+        config.setRetriesNumber(retriesNum);
         config.setIgnoreSsl(ignoreSsl);
         config.save();
 

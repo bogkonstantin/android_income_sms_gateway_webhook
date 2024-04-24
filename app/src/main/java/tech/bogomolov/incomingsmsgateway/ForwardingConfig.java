@@ -20,6 +20,7 @@ public class ForwardingConfig {
     private static final String KEY_SIM_SLOT = "sim_slot";
     private static final String KEY_TEMPLATE = "template";
     private static final String KEY_HEADERS = "headers";
+    private static final String KEY_RETRIES_NUMBER = "retries_number";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
     private static final String KEY_IS_SMS_ENABLED = "is_sms_enabled";
 
@@ -29,6 +30,7 @@ public class ForwardingConfig {
     private int simSlot = 0; // 0 means any
     private String template;
     private String headers;
+    private int retriesNumber;
     private boolean ignoreSsl = false;
     private boolean isSmsEnabled = true;
 
@@ -84,6 +86,14 @@ public class ForwardingConfig {
         this.headers = headers;
     }
 
+    public int getRetriesNumber() {
+        return this.retriesNumber;
+    }
+
+    public void setRetriesNumber(int retriesNumber) {
+        this.retriesNumber = retriesNumber;
+    }
+
     public boolean getIgnoreSsl() {
         return this.ignoreSsl;
     }
@@ -108,6 +118,10 @@ public class ForwardingConfig {
         return "{\"User-agent\":\"SMS Forwarder App\"}";
     }
 
+    public static int getDefaultRetriesNumber() {
+        return 10;
+    }
+
     public void save() {
         try {
             if (this.getKey() == null) {
@@ -121,6 +135,7 @@ public class ForwardingConfig {
             json.put(KEY_SIM_SLOT, this.simSlot);
             json.put(KEY_TEMPLATE, this.template);
             json.put(KEY_HEADERS, this.headers);
+            json.put(KEY_RETRIES_NUMBER, this.retriesNumber);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
             json.put(KEY_IS_SMS_ENABLED, this.isSmsEnabled);
 
@@ -174,6 +189,12 @@ public class ForwardingConfig {
                     config.setUrl(json.getString(KEY_URL));
                     config.setTemplate(json.getString(KEY_TEMPLATE));
                     config.setHeaders(json.getString(KEY_HEADERS));
+
+                    if (!json.has(KEY_RETRIES_NUMBER)) {
+                        config.setRetriesNumber(ForwardingConfig.getDefaultRetriesNumber());
+                    } else {
+                        config.setRetriesNumber(json.getInt(KEY_RETRIES_NUMBER));
+                    }
 
                     try {
                         config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));

@@ -35,7 +35,7 @@ public class WebHookWorkRequest extends Worker {
     public final static String DATA_TEXT = "TEXT";
     public final static String DATA_HEADERS = "HEADERS";
     public final static String DATA_IGNORE_SSL = "IGNORE_SSL";
-    public static final int MAX_ATTEMPT = 10;
+    public final static String DATA_MAX_RETRIES = "MAX_RETRIES";
 
     public static final String RESULT_SUCCESS = "success";
     public static final String RESULT_ERROR = "error";
@@ -50,7 +50,9 @@ public class WebHookWorkRequest extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        if (getRunAttemptCount() > MAX_ATTEMPT) {
+        int maxRetries = getInputData().getInt(DATA_MAX_RETRIES, 10);
+
+        if (getRunAttemptCount() > maxRetries) {
             return Result.failure();
         }
 

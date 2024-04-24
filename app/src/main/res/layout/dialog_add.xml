@@ -158,6 +158,26 @@
             android:textSize="11sp"
             android:typeface="monospace" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="16dp"
+            android:labelFor="@+id/input_number_retries"
+            android:text="@string/label_number_retries" />
+
+        <EditText
+            android:id="@+id/input_number_retries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
+            android:inputType="number" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
