@@ -77,35 +77,36 @@ public class SmsReceiver extends BroadcastReceiver {
                 slotName = "sim" + slotId;
             }
 
-            String messageContent = config.getTemplate()
-                    .replaceAll("%from%", sender)
-                    .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
-                    .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                    .replaceAll("%sim%", slotName)
-                    .replaceAll("%text%",
-                            Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
-            this.callWebHook(
-                    config.getUrl(),
-                    messageContent,
-                    config.getHeaders(),
-                    config.getIgnoreSsl(),
-                    config.getRetriesNumber()
-            );
+            this.callWebHook(config, sender, slotName, content, messages[0].getTimestampMillis());
         }
     }
 
-    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl, int maxRetries) {
+    protected void callWebHook(
+            ForwardingConfig config,
+            String sender,
+            String slotName,
+            StringBuilder content,
+            long timeStamp
+    ) {
+        String message = config.getTemplate()
+                .replaceAll("%from%", sender)
+                .replaceAll("%sentStamp%", String.valueOf(timeStamp))
+                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                .replaceAll("%sim%", slotName)
+                .replaceAll("%text%",
+                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
         Data data = new Data.Builder()
-                .putString(WebHookWorkRequest.DATA_URL, url)
+                .putString(WebHookWorkRequest.DATA_URL, config.getUrl())
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
-                .putString(WebHookWorkRequest.DATA_HEADERS, headers)
-                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
-                .putInt(WebHookWorkRequest.DATA_MAX_RETRIES, maxRetries)
+                .putString(WebHookWorkRequest.DATA_HEADERS, config.getHeaders())
+                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, config.getIgnoreSsl())
+                .putBoolean(WebHookWorkRequest.DATA_CHUNKED_MODE, config.getChunkedMode())
+                .putInt(WebHookWorkRequest.DATA_MAX_RETRIES, config.getRetriesNumber())
                 .build();
 
         WorkRequest webhookWorkRequest =

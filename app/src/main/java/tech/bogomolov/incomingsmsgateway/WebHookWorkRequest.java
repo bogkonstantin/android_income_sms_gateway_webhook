@@ -36,6 +36,7 @@ public class WebHookWorkRequest extends Worker {
     public final static String DATA_HEADERS = "HEADERS";
     public final static String DATA_IGNORE_SSL = "IGNORE_SSL";
     public final static String DATA_MAX_RETRIES = "MAX_RETRIES";
+    public final static String DATA_CHUNKED_MODE = "CHUNKED_MODE";
 
     public static final String RESULT_SUCCESS = "success";
     public static final String RESULT_ERROR = "error";
@@ -60,8 +61,9 @@ public class WebHookWorkRequest extends Worker {
         String text = getInputData().getString(DATA_TEXT);
         String headers = getInputData().getString(DATA_HEADERS);
         boolean ignoreSsl = getInputData().getBoolean(DATA_IGNORE_SSL, false);
+        boolean useChunkedMode = getInputData().getBoolean(DATA_CHUNKED_MODE, true);
 
-        String result = this.makeRequest(url, text, headers, ignoreSsl);
+        String result = this.makeRequest(url, text, headers, ignoreSsl, useChunkedMode);
 
         if (result.equals(RESULT_RETRY)) {
             return Result.retry();
@@ -75,7 +77,13 @@ public class WebHookWorkRequest extends Worker {
     }
 
     @SuppressLint({"AllowAllHostnameVerifier"})
-    private String makeRequest(String urlString, String text, String headers, boolean ignoreSsl) {
+    private String makeRequest(
+            String urlString,
+            String text,
+            String headers,
+            boolean ignoreSsl,
+            boolean useChunkedMode
+    ) {
         String result = RESULT_SUCCESS;
 
         Log.i("SmsGateway", "request " + urlString);
@@ -97,7 +105,11 @@ public class WebHookWorkRequest extends Worker {
             }
 
             urlConnection.setDoOutput(true);
-            urlConnection.setChunkedStreamingMode(0);
+            if (useChunkedMode) {
+                urlConnection.setChunkedStreamingMode(0);
+            } else {
+                urlConnection.setFixedLengthStreamingMode(text.length());
+            }
 
             urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 

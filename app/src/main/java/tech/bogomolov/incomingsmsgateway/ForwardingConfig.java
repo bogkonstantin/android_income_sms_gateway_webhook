@@ -22,6 +22,7 @@ public class ForwardingConfig {
     private static final String KEY_HEADERS = "headers";
     private static final String KEY_RETRIES_NUMBER = "retries_number";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
+    private static final String KEY_CHUNKED_MODE = "chunked_mode";
     private static final String KEY_IS_SMS_ENABLED = "is_sms_enabled";
 
     private String key;
@@ -32,6 +33,7 @@ public class ForwardingConfig {
     private String headers;
     private int retriesNumber;
     private boolean ignoreSsl = false;
+    private boolean chunkedMode = true;
     private boolean isSmsEnabled = true;
 
     public ForwardingConfig(Context context) {
@@ -102,6 +104,14 @@ public class ForwardingConfig {
         this.ignoreSsl = ignoreSsl;
     }
 
+    public boolean getChunkedMode() {
+        return this.chunkedMode;
+    }
+
+    public void setChunkedMode(boolean chunkedMode) {
+        this.chunkedMode = chunkedMode;
+    }
+
     public boolean getIsSmsEnabled() {
         return this.isSmsEnabled;
     }
@@ -137,6 +147,7 @@ public class ForwardingConfig {
             json.put(KEY_HEADERS, this.headers);
             json.put(KEY_RETRIES_NUMBER, this.retriesNumber);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
+            json.put(KEY_CHUNKED_MODE, this.chunkedMode);
             json.put(KEY_IS_SMS_ENABLED, this.isSmsEnabled);
 
             SharedPreferences.Editor editor = getEditor(context);
@@ -198,6 +209,7 @@ public class ForwardingConfig {
 
                     try {
                         config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
+                        config.setChunkedMode(json.getBoolean(KEY_CHUNKED_MODE));
                     } catch (JSONException ignored) {
                     }
                 } catch (JSONException e) {

@@ -36,6 +36,9 @@ public class ForwardingConfigDialog {
         final EditText retriesNumInput = view.findViewById(R.id.input_number_retries);
         retriesNumInput.setText(String.valueOf(ForwardingConfig.getDefaultRetriesNumber()));
 
+        final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
+        chunkedModeCheckbox.setChecked(true);
+
         prepareSimSelector(context, view, 0);
 
         builder.setView(view);
@@ -87,6 +90,9 @@ public class ForwardingConfigDialog {
 
         final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
         ignoreSslCheckbox.setChecked(config.getIgnoreSsl());
+
+        final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
+        chunkedModeCheckbox.setChecked(config.getChunkedMode());
 
         builder.setView(view);
         builder.setPositiveButton(R.string.btn_save, null);
@@ -160,12 +166,16 @@ public class ForwardingConfigDialog {
         final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
         boolean ignoreSsl = ignoreSslCheckbox.isChecked();
 
+        final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
+        boolean chunkedMode = chunkedModeCheckbox.isChecked();
+
         config.setSender(sender);
         config.setUrl(url);
         config.setTemplate(template);
         config.setHeaders(headers);
         config.setRetriesNumber(retriesNum);
         config.setIgnoreSsl(ignoreSsl);
+        config.setChunkedMode(chunkedMode);
         config.save();
 
         return config;
