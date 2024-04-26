@@ -8,9 +8,13 @@
     <string name="btn_add">Add</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_clear">Clear</string>
     <string name="btn_test">Test</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_delete">Delete</string>
+    <string name="btn_on">On</string>
+    <string name="btn_off">Off</string>
     <string name="delete_record">Delete record</string>
     <string name="key_phones_preference">phones</string>
     <string name="label_add_sender">Sender (number or text)</string>
@@ -34,6 +38,5 @@
     <string name="any">Any</string>
     <string name="confirm_delete">Do you really want to delete "%s" record?</string>
     <string name="notification_channel">Default</string>
-    <string name="btn_on">On</string>
-    <string name="btn_off">Off</string>
+    <string name="menu_syslog">Syslog</string>
 </resources>

@@ -2,12 +2,17 @@ package tech.bogomolov.incomingsmsgateway;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,7 +23,11 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +68,67 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_bar_syslogs) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            View view = getLayoutInflater().inflate(R.layout.syslogs, null);
+
+            String logs = "";
+            try {
+                String[] command = new String[]{
+                        "logcat", "-d", "*:E", "-m", "1000",
+                        "|", "grep", "tech.bogomolov.incomingsmsgateway"};
+                Process process = Runtime.getRuntime().exec(command);
+
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()));
+
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    logs += line + "\n";
+                }
+            } catch (IOException ex) {
+                logs = "getLog failed";
+            }
+
+            TextView logsTextContainer = view.findViewById(R.id.syslogs_text);
+            logsTextContainer.setText(logs);
+
+            TextView version = view.findViewById(R.id.syslogs_version);
+            version.setText("v" + BuildConfig.VERSION_NAME);
+
+            builder.setView(view);
+            builder.setNegativeButton(R.string.btn_close, null);
+            builder.setNeutralButton(R.string.btn_clear, null);
+
+            final AlertDialog dialog = builder.show();
+            Objects.requireNonNull(dialog.getWindow())
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                    .setOnClickListener(view1 -> {
+                        String[] command = new String[]{"logcat", "-c"};
+                        try {
+                            Runtime.getRuntime().exec(command);
+                        } catch (IOException e) {
+                            Log.e("SmsGateway", "log clear error: " + e);
+                        }
+                        dialog.cancel();
+                    });
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void showList() {
         showInfo("");
 
@@ -80,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if(tech.bogomolov.incomingsmsgateway.SmsReceiverService.class.getName().equals(service.service.getClassName())) {
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (tech.bogomolov.incomingsmsgateway.SmsReceiverService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }
