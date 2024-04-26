@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View.OnClickListener showAddDialog() {
         return v -> {
-            ForwardingConfigDialog.showNewDialog(context, getLayoutInflater(), listAdapter);
+            (new ForwardingConfigDialog(context, getLayoutInflater(), listAdapter)).showNew();
         };
     }
 }

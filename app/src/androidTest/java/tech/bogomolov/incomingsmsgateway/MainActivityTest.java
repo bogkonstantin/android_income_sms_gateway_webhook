@@ -54,13 +54,13 @@ public class MainActivityTest {
     @Test
     public void testAddDialogOpen() {
         onView(withId(R.id.btn_add)).perform(click());
-        onView(withId(R.id.dialog_add)).check(matches(isDisplayed()));
+        onView(withId(R.id.dialog_config_edit_form)).check(matches(isDisplayed()));
     }
 
     @Test
     public void testEmptySenderError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_url))
                 .perform(typeText("https://example.com"));
@@ -76,7 +76,7 @@ public class MainActivityTest {
     @Test
     public void testEmptyUrlError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -92,7 +92,7 @@ public class MainActivityTest {
     @Test
     public void testWrongUrlError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -111,7 +111,7 @@ public class MainActivityTest {
     @Test
     public void tesEmptyJsonTemplateError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -133,7 +133,7 @@ public class MainActivityTest {
     @Test
     public void tesWrongJsonTemplateError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -155,7 +155,7 @@ public class MainActivityTest {
     @Test
     public void tesEmptyJsonHeadersError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -177,7 +177,7 @@ public class MainActivityTest {
     @Test
     public void tesWrongJsonHeadersError() {
         onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+        ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
         onView(withId(R.id.input_phone))
                 .perform(typeText("test"));
@@ -214,7 +214,7 @@ public class MainActivityTest {
         );
         record.check(matches(isDisplayed()));
 
-        onView(withId(R.id.dialog_add)).check(doesNotExist());
+        onView(withId(R.id.dialog_config_edit_form)).check(doesNotExist());
 
 
         ViewInteraction deleteButton = onView(allOf(
@@ -231,7 +231,7 @@ public class MainActivityTest {
 
         onView(withText(R.string.delete_record)).check(doesNotExist());
         record.check(doesNotExist());
-        onView(withId(R.id.dialog_add)).check(doesNotExist());
+        onView(withId(R.id.dialog_config_edit_form)).check(doesNotExist());
     }
 
     private String getResourceString(int id) {

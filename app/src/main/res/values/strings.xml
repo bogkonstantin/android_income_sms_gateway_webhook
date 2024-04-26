@@ -8,6 +8,7 @@
     <string name="btn_add">Add</string>
     <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_test">Test</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_delete">Delete</string>
     <string name="delete_record">Delete record</string>

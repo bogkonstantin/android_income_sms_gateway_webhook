@@ -1,7 +1,10 @@
 package tech.bogomolov.incomingsmsgateway;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.telephony.SubscriptionManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,11 +25,31 @@ import java.util.Objects;
 
 public class ForwardingConfigDialog {
 
-    public static void showNewDialog(
-            Context context, LayoutInflater layoutInflater, ListAdapter listAdapter) {
+    static final public String BROADCAST_KEY = "TEST_RESULT";
 
+    final private Context context;
+    final private LayoutInflater layoutInflater;
+    final private ListAdapter listAdapter;
+
+    public ForwardingConfigDialog(Context context, LayoutInflater layoutInflater, ListAdapter listAdapter) {
+        this.context = context;
+        this.layoutInflater = layoutInflater;
+        this.listAdapter = listAdapter;
+
+        IntentFilter filter = new IntentFilter(BROADCAST_KEY);
+        BroadcastReceiver testResult = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String result = intent.getStringExtra(BROADCAST_KEY);
+                Toast.makeText(context.getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            }
+        };
+        context.registerReceiver(testResult, filter);
+    }
+
+    public void showNew() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = layoutInflater.inflate(R.layout.dialog_add, null);
+        View view = layoutInflater.inflate(R.layout.dialog_config_edit_form, null);
 
         final EditText templateInput = view.findViewById(R.id.input_json_template);
         templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
@@ -44,6 +68,7 @@ public class ForwardingConfigDialog {
         builder.setView(view);
         builder.setPositiveButton(R.string.btn_add, null);
         builder.setNegativeButton(R.string.btn_cancel, null);
+        builder.setNeutralButton(R.string.btn_test, null);
 
         final AlertDialog dialog = builder.show();
         Objects.requireNonNull(dialog.getWindow())
@@ -51,25 +76,26 @@ public class ForwardingConfigDialog {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(view1 -> {
-                    ForwardingConfig config = ForwardingConfigDialog
-                            .populateConfig(view, context, new ForwardingConfig(context));
+                    ForwardingConfig config = populateConfig(view, context, new ForwardingConfig(context));
                     if (config == null) {
                         return;
                     }
+                    config.save();
 
                     listAdapter.add(config);
                     dialog.dismiss();
                 });
+
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                .setOnClickListener(view1 -> {
+                    ForwardingConfig config = populateConfig(view, context, new ForwardingConfig(context));
+                    testConfig(config);
+                });
     }
 
-    public static void showEditDialog(
-            ForwardingConfig config,
-            Context context,
-            LayoutInflater layoutInflater,
-            ListAdapter listAdapter
-    ) {
+    public void showEdit(ForwardingConfig config) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = layoutInflater.inflate(R.layout.dialog_add, null);
+        View view = layoutInflater.inflate(R.layout.dialog_config_edit_form, null);
 
         final EditText phoneInput = view.findViewById(R.id.input_phone);
         phoneInput.setText(config.getSender());
@@ -97,6 +123,7 @@ public class ForwardingConfigDialog {
         builder.setView(view);
         builder.setPositiveButton(R.string.btn_save, null);
         builder.setNegativeButton(R.string.btn_cancel, null);
+        builder.setNeutralButton(R.string.btn_test, null);
 
         final AlertDialog dialog = builder.show();
         Objects.requireNonNull(dialog.getWindow())
@@ -104,16 +131,23 @@ public class ForwardingConfigDialog {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 .setOnClickListener(view1 -> {
-                    ForwardingConfig configUpdated = ForwardingConfigDialog.populateConfig(view, context, config);
+                    ForwardingConfig configUpdated = populateConfig(view, context, config);
                     if (configUpdated == null) {
                         return;
                     }
+                    configUpdated.save();
                     listAdapter.notifyDataSetChanged();
                     dialog.dismiss();
                 });
+
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                .setOnClickListener(view1 -> {
+                    ForwardingConfig configUpdated = populateConfig(view, context, config);
+                    testConfig(configUpdated);
+                });
     }
 
-    public static ForwardingConfig populateConfig(View view, Context context, ForwardingConfig config) {
+    public ForwardingConfig populateConfig(View view, Context context, ForwardingConfig config) {
         final EditText senderInput = view.findViewById(R.id.input_phone);
         String sender = senderInput.getText().toString();
         if (TextUtils.isEmpty(sender)) {
@@ -176,12 +210,11 @@ public class ForwardingConfigDialog {
         config.setRetriesNumber(retriesNum);
         config.setIgnoreSsl(ignoreSsl);
         config.setChunkedMode(chunkedMode);
-        config.save();
 
         return config;
     }
 
-    private static void prepareSimSelector(Context context, View view, int selected) {
+    private void prepareSimSelector(Context context, View view, int selected) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
             SubscriptionManager subscriptionManager =
                     (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
@@ -209,5 +242,30 @@ public class ForwardingConfigDialog {
                 simSlotSelector.setSelection(selected);
             }
         }
+    }
+
+    private void testConfig(ForwardingConfig config) {
+        if (config == null) {
+            return;
+        }
+
+        Thread thread = new Thread(() -> {
+            String payload = config.prepareMessage(
+                    "123456789", "test message", "sim1", System.currentTimeMillis());
+            Request request = new Request(config.getUrl(), payload);
+            request.setJsonHeaders(config.getHeaders());
+            request.setIgnoreSsl(config.getIgnoreSsl());
+            request.setUseChunkedMode(config.getChunkedMode());
+
+            String result = request.execute();
+            if (!Objects.equals(result, Request.RESULT_SUCCESS)) {
+                result = Request.RESULT_ERROR;
+            }
+
+            Intent in = new Intent(BROADCAST_KEY);
+            in.putExtra(BROADCAST_KEY, result);
+            context.sendBroadcast(in);
+        });
+        thread.start();
     }
 }

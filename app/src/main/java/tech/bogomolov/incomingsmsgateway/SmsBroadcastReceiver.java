@@ -17,11 +17,8 @@ import androidx.work.WorkRequest;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 
-import org.apache.commons.text.StringEscapeUtils;
-
-public class SmsReceiver extends BroadcastReceiver {
+public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     private Context context;
 
@@ -81,36 +78,26 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    protected void callWebHook(
-            ForwardingConfig config,
-            String sender,
-            String slotName,
-            StringBuilder content,
-            long timeStamp
-    ) {
-        String message = config.getTemplate()
-                .replaceAll("%from%", sender)
-                .replaceAll("%sentStamp%", String.valueOf(timeStamp))
-                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                .replaceAll("%sim%", slotName)
-                .replaceAll("%text%",
-                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
+    protected void callWebHook(ForwardingConfig config, String sender, String slotName,
+                               StringBuilder content, long timeStamp) {
+
+        String message = config.prepareMessage(sender, content.toString(), slotName, timeStamp);
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
         Data data = new Data.Builder()
-                .putString(WebHookWorkRequest.DATA_URL, config.getUrl())
-                .putString(WebHookWorkRequest.DATA_TEXT, message)
-                .putString(WebHookWorkRequest.DATA_HEADERS, config.getHeaders())
-                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, config.getIgnoreSsl())
-                .putBoolean(WebHookWorkRequest.DATA_CHUNKED_MODE, config.getChunkedMode())
-                .putInt(WebHookWorkRequest.DATA_MAX_RETRIES, config.getRetriesNumber())
+                .putString(RequestWorker.DATA_URL, config.getUrl())
+                .putString(RequestWorker.DATA_TEXT, message)
+                .putString(RequestWorker.DATA_HEADERS, config.getHeaders())
+                .putBoolean(RequestWorker.DATA_IGNORE_SSL, config.getIgnoreSsl())
+                .putBoolean(RequestWorker.DATA_CHUNKED_MODE, config.getChunkedMode())
+                .putInt(RequestWorker.DATA_MAX_RETRIES, config.getRetriesNumber())
                 .build();
 
-        WorkRequest webhookWorkRequest =
-                new OneTimeWorkRequest.Builder(WebHookWorkRequest.class)
+        WorkRequest workRequest =
+                new OneTimeWorkRequest.Builder(RequestWorker.class)
                         .setConstraints(constraints)
                         .setBackoffCriteria(
                                 BackoffPolicy.EXPONENTIAL,
@@ -122,7 +109,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         WorkManager
                 .getInstance(this.context)
-                .enqueue(webhookWorkRequest);
+                .enqueue(workRequest);
 
     }
 

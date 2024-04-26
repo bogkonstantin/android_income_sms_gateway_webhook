@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
 
 public class ForwardingConfig {
     final private Context context;
@@ -231,6 +233,16 @@ public class ForwardingConfig {
         SharedPreferences.Editor editor = getEditor(context);
         editor.remove(this.getKey());
         editor.commit();
+    }
+
+    public String prepareMessage(String from, String content, String sim, long timeStamp) {
+        return this.getTemplate()
+                .replaceAll("%from%", from)
+                .replaceAll("%sentStamp%", String.valueOf(timeStamp))
+                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                .replaceAll("%sim%", sim)
+                .replaceAll("%text%",
+                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content)));
     }
 
     private static SharedPreferences getPreference(Context context) {

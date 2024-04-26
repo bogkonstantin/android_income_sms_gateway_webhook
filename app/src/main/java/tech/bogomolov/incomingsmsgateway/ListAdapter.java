@@ -90,13 +90,11 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         ListAdapter listAdapter = this;
         final int position = (int) view.getTag(R.id.edit_button);
         final ForwardingConfig config = listAdapter.getItem(position);
-
-        ForwardingConfigDialog.showEditDialog(
-                config,
+        (new ForwardingConfigDialog(
                 context,
                 (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE),
                 listAdapter
-        );
+        )).showEdit(config);
     }
 
     public void onDeleteClick(View view) {
