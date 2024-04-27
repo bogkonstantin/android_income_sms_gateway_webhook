@@ -74,14 +74,14 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 slotName = "sim" + slotId;
             }
 
-            this.callWebHook(config, sender, slotName, content, messages[0].getTimestampMillis());
+            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis());
         }
     }
 
     protected void callWebHook(ForwardingConfig config, String sender, String slotName,
-                               StringBuilder content, long timeStamp) {
+                               String content, long timeStamp) {
 
-        String message = config.prepareMessage(sender, content.toString(), slotName, timeStamp);
+        String message = config.prepareMessage(sender, content, slotName, timeStamp);
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)

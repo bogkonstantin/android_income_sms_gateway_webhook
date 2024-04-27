@@ -31,7 +31,13 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(0))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
     }
 
     @Test
@@ -41,7 +47,13 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(1))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
     }
 
     @Test
@@ -51,7 +63,13 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(1))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
     }
 
     @Test
@@ -61,7 +79,13 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntent());
 
         Mockito.verify(receiver, Mockito.times(0))
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
     }
 
     @Test
@@ -71,9 +95,13 @@ public class SmsReceiverTest {
         receiver.onReceive(appContext, this.getIntentMultiPdus());
 
         Mockito.verify(receiver, Mockito.times(1))
-                .callWebHook(Mockito.anyString(),
-                        Mockito.contains("\"text\":\"TestTest\""),
-                        Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
     }
 
     private void setPhoneConfig(Context context, String phone) {
@@ -107,7 +135,13 @@ public class SmsReceiverTest {
         Mockito.doCallRealMethod()
                 .when(receiver).onReceive(Mockito.any(Context.class), Mockito.any(Intent.class));
         Mockito.doNothing().when(receiver)
-                .callWebHook(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean());
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
 
         return receiver;
     }

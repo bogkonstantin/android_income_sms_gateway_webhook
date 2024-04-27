@@ -109,7 +109,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void tesEmptyJsonTemplateError() {
+    public void testEmptyJsonTemplateError() {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
@@ -131,7 +131,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void tesWrongJsonTemplateError() {
+    public void testWrongJsonTemplateError() {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
@@ -153,7 +153,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void tesEmptyJsonHeadersError() {
+    public void testEmptyJsonHeadersError() {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
@@ -164,7 +164,7 @@ public class MainActivityTest {
                 .perform(typeText("https://example.com"));
 
         onView(withId(R.id.input_json_headers))
-                .perform(replaceText(""));
+                .perform(scrollTo(), replaceText(""));
 
         onView(withText(R.string.btn_add)).perform(click());
 
@@ -175,7 +175,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void tesWrongJsonHeadersError() {
+    public void testWrongJsonHeadersError() {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_config_edit_form));
 
@@ -186,7 +186,7 @@ public class MainActivityTest {
                 .perform(typeText("https://example.com"));
 
         onView(withId(R.id.input_json_headers))
-                .perform(replaceText("{"));
+                .perform(scrollTo(), replaceText("{"));
 
         onView(withText(R.string.btn_add)).perform(click());
 
