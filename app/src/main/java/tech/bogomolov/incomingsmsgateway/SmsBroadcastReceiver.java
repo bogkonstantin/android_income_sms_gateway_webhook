@@ -17,11 +17,8 @@ import androidx.work.WorkRequest;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 
-import org.apache.commons.text.StringEscapeUtils;
-
-public class SmsReceiver extends BroadcastReceiver {
+public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     private Context context;
 
@@ -50,49 +47,57 @@ public class SmsReceiver extends BroadcastReceiver {
         String asterisk = context.getString(R.string.asterisk);
 
         String sender = messages[0].getOriginatingAddress();
-
-        ForwardingConfig matchedConfig = null;
-        for (ForwardingConfig config : configs) {
-            if (sender.equals(config.getSender()) || config.getSender().equals(asterisk)) {
-                matchedConfig = config;
-                break;
-            }
-        }
-
-        if (matchedConfig == null) {
+        if (sender == null) {
             return;
         }
 
-        String messageContent = matchedConfig.getTemplate()
-                .replaceAll("%from%", sender)
-                .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
-                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                .replaceAll("%sim%", this.detectSim(bundle))
-                .replaceAll("%text%",
-                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
-        this.callWebHook(
-                matchedConfig.getUrl(),
-                messageContent,
-                matchedConfig.getHeaders(),
-                matchedConfig.getIgnoreSsl()
-        );
+        for (ForwardingConfig config : configs) {
+            if (!sender.equals(config.getSender()) && !config.getSender().equals(asterisk)) {
+                continue;
+            }
+
+            if (!config.getIsSmsEnabled()) {
+                continue;
+            }
+
+            int slotId = this.detectSim(bundle) + 1;
+            String slotName = "undetected";
+            if (slotId < 0) {
+                slotId = 0;
+            }
+
+            if (config.getSimSlot() > 0 && config.getSimSlot() != slotId) {
+                continue;
+            }
+
+            if (slotId > 0) {
+                slotName = "sim" + slotId;
+            }
+
+            this.callWebHook(config, sender, slotName, content.toString(), messages[0].getTimestampMillis());
+        }
     }
 
-    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {
+    protected void callWebHook(ForwardingConfig config, String sender, String slotName,
+                               String content, long timeStamp) {
+
+        String message = config.prepareMessage(sender, content, slotName, timeStamp);
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
         Data data = new Data.Builder()
-                .putString(WebHookWorkRequest.DATA_URL, url)
-                .putString(WebHookWorkRequest.DATA_TEXT, message)
-                .putString(WebHookWorkRequest.DATA_HEADERS, headers)
-                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
+                .putString(RequestWorker.DATA_URL, config.getUrl())
+                .putString(RequestWorker.DATA_TEXT, message)
+                .putString(RequestWorker.DATA_HEADERS, config.getHeaders())
+                .putBoolean(RequestWorker.DATA_IGNORE_SSL, config.getIgnoreSsl())
+                .putBoolean(RequestWorker.DATA_CHUNKED_MODE, config.getChunkedMode())
+                .putInt(RequestWorker.DATA_MAX_RETRIES, config.getRetriesNumber())
                 .build();
 
-        WorkRequest webhookWorkRequest =
-                new OneTimeWorkRequest.Builder(WebHookWorkRequest.class)
+        WorkRequest workRequest =
+                new OneTimeWorkRequest.Builder(RequestWorker.class)
                         .setConstraints(constraints)
                         .setBackoffCriteria(
                                 BackoffPolicy.EXPONENTIAL,
@@ -104,11 +109,11 @@ public class SmsReceiver extends BroadcastReceiver {
 
         WorkManager
                 .getInstance(this.context)
-                .enqueue(webhookWorkRequest);
+                .enqueue(workRequest);
 
     }
 
-    private String detectSim(Bundle bundle) {
+    private int detectSim(Bundle bundle) {
         int slotId = -1;
         Set<String> keySet = bundle.keySet();
         for (String key : keySet) {
@@ -154,12 +159,6 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         }
 
-        if (slotId == 0) {
-            return "sim1";
-        } else if (slotId == 1) {
-            return "sim2";
-        } else {
-            return "undetected";
-        }
+        return slotId;
     }
 }

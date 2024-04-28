@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,12 +23,11 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,6 +68,67 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_bar_syslogs) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            View view = getLayoutInflater().inflate(R.layout.syslogs, null);
+
+            String logs = "";
+            try {
+                String[] command = new String[]{
+                        "logcat", "-d", "*:E", "-m", "1000",
+                        "|", "grep", "tech.bogomolov.incomingsmsgateway"};
+                Process process = Runtime.getRuntime().exec(command);
+
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()));
+
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    logs += line + "\n";
+                }
+            } catch (IOException ex) {
+                logs = "getLog failed";
+            }
+
+            TextView logsTextContainer = view.findViewById(R.id.syslogs_text);
+            logsTextContainer.setText(logs);
+
+            TextView version = view.findViewById(R.id.syslogs_version);
+            version.setText("v" + BuildConfig.VERSION_NAME);
+
+            builder.setView(view);
+            builder.setNegativeButton(R.string.btn_close, null);
+            builder.setNeutralButton(R.string.btn_clear, null);
+
+            final AlertDialog dialog = builder.show();
+            Objects.requireNonNull(dialog.getWindow())
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                    .setOnClickListener(view1 -> {
+                        String[] command = new String[]{"logcat", "-c"};
+                        try {
+                            Runtime.getRuntime().exec(command);
+                        } catch (IOException e) {
+                            Log.e("SmsGateway", "log clear error: " + e);
+                        }
+                        dialog.cancel();
+                    });
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void showList() {
         showInfo("");
 
@@ -90,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if(tech.bogomolov.incomingsmsgateway.SmsReceiverService.class.getName().equals(service.service.getClassName())) {
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (tech.bogomolov.incomingsmsgateway.SmsReceiverService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }
@@ -116,72 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View.OnClickListener showAddDialog() {
         return v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
-            final EditText senderInput = view.findViewById(R.id.input_phone);
-            final EditText urlInput = view.findViewById(R.id.input_url);
-            final EditText templateInput = view.findViewById(R.id.input_json_template);
-            final EditText headersInput = view.findViewById(R.id.input_json_headers);
-            final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
-
-            templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
-            headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
-
-            builder.setView(view);
-            builder.setPositiveButton(R.string.btn_add, null);
-            builder.setNegativeButton(R.string.btn_cancel, null);
-            final AlertDialog dialog = builder.show();
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
-                String sender = senderInput.getText().toString();
-                if (TextUtils.isEmpty(sender)) {
-                    senderInput.setError(getString(R.string.error_empty_sender));
-                    return;
-                }
-
-                String url = urlInput.getText().toString();
-                if (TextUtils.isEmpty(url)) {
-                    urlInput.setError(getString(R.string.error_empty_url));
-                    return;
-                }
-
-                try {
-                    new URL(url);
-                } catch (MalformedURLException e) {
-                    urlInput.setError(getString(R.string.error_wrong_url));
-                    return;
-                }
-
-                String template = templateInput.getText().toString();
-                try {
-                    new JSONObject(template);
-                } catch (JSONException e) {
-                    templateInput.setError(getString(R.string.error_wrong_json));
-                    return;
-                }
-
-                String headers = headersInput.getText().toString();
-                try {
-                    new JSONObject(headers);
-                } catch (JSONException e) {
-                    headersInput.setError(getString(R.string.error_wrong_json));
-                    return;
-                }
-
-                boolean ignoreSsl = ignoreSslCheckbox.isChecked();
-
-                ForwardingConfig config = new ForwardingConfig(context);
-                config.setSender(sender);
-                config.setUrl(url);
-                config.setTemplate(template);
-                config.setHeaders(headers);
-                config.setIgnoreSsl(ignoreSsl);
-                config.save();
-
-                listAdapter.add(config);
-
-                dialog.dismiss();
-            });
+            (new ForwardingConfigDialog(context, getLayoutInflater(), listAdapter)).showNew();
         };
     }
 }

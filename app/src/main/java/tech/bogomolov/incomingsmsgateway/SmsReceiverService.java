@@ -20,7 +20,7 @@ public class SmsReceiverService extends Service {
     private static final String CHANNEL_ID = "SmsDefault";
 
     public SmsReceiverService() {
-        receiver = new SmsReceiver();
+        receiver = new SmsBroadcastReceiver();
     }
 
     @Override
