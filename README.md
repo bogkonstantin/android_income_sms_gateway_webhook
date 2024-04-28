@@ -4,17 +4,25 @@
 
 ## How to use
 
-Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed and "Display pop-up windows while running in the background" from Xiaomi devices.
+Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed
+and "Display pop-up windows while running in the background" from Xiaomi devices.
 
 Set sender phone number or name and URL. It should match the number or name you see in the SMS messenger app. 
 If you want to send any SMS to URL, use * (asterisk symbol) as a name.  
 
-Every incoming SMS will be sent immediately to the provided URL. 
-If the response code is not 2XX or the request ended with a connection error, the app will try to send again up to 10 times.
+Every incoming SMS will be sent immediately to the provided URL.
+If the response code is not 2XX or the request ended with a connection error, the app will try to
+send again up to 10 times (can be changed in parameters).
 Minimum first retry will be after 10 seconds, later wait time will increase exponentially.
-If the phone is not connected to the internet, the app will wait for the connection before the next attempt.
+If the phone is not connected to the internet, the app will wait for the connection before the next
+attempt.  
 
-If at least one Forwarding config is created and all needed permissions granted - you should see F icon in the status bar, means the app is listening for the SMS.
+If at least one Forwarding config is created and all needed permissions granted - you should see F
+icon in the status bar, means the app is listening for the SMS.
+
+Press the Test button to make a test request to the server.
+
+Press the Syslog button to view errors stored in the Logcat.
 
 ### Request info
 HTTP method: POST  
@@ -51,7 +59,7 @@ curl -X 'POST' 'https://yourwebsite.com/path' \
 1. Create Telegram bot and channel to receive messages. [There](https://bogomolov.tech/Telegram-notification-on-SSH-login/) is short tutorial how to do that.  
 2. Add new forwarding configuration in the app using this parameters:
    1. Any sender you need, * - on the screenshot
-   2. Webhook URL - https://api.telegram.org/bot<YourBOTToken>/sendMessage?chat_id=<channel_id> - change URL using your token and channel id
+   2. Webhook URL - `https://api.telegram.org/bot<YourBOTToken>/sendMessage?chat_id=<channel_id>` - change URL using your token and channel id
    3. Use this payload as a sample `{"text":"sms from %from% with text: \"%text%\" sent at %sentStamp%"}`
    4. Save configuration
 
