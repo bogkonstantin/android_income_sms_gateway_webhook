@@ -19,12 +19,17 @@
         <service
             android:name=".SmsReceiverService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true" >
+        <intent-filter android:priority="1000">
+            <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            <action android:name="android.provider.Telephony.SMS_DELIVER" />
+        </intent-filter>
+        </service>
 
         <receiver
             android:name=".BootCompletedReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" android:priority="999">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
