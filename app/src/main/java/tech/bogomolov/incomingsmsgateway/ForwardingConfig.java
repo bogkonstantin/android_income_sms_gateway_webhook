@@ -26,6 +26,8 @@ public class ForwardingConfig {
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
     private static final String KEY_CHUNKED_MODE = "chunked_mode";
     private static final String KEY_IS_SMS_ENABLED = "is_sms_enabled";
+    private static final String KEY_ENCRYPT_HMAC_SHA_256 = "encrypt_hmac_sha_256";
+    private static final String KEY_ENCRYPT_HMAC_SHA_256_KEY = "encrypt_hmac_sha_256_key";
 
     private String key;
     private String sender;
@@ -37,6 +39,8 @@ public class ForwardingConfig {
     private boolean ignoreSsl = false;
     private boolean chunkedMode = true;
     private boolean isSmsEnabled = true;
+    private boolean encryptHmacSha256 = false;
+    private String encryptHmacSha256Key;
 
     public ForwardingConfig(Context context) {
         this.context = context;
@@ -114,6 +118,23 @@ public class ForwardingConfig {
         this.chunkedMode = chunkedMode;
     }
 
+    public boolean getEncryptHmacSha256() {
+        return this.encryptHmacSha256;
+    }
+
+    public void setEncryptHmacSha256(boolean encryptHmacSha256) {
+        this.encryptHmacSha256 = encryptHmacSha256;
+    }
+
+    public String getEncryptHmacSha256Key() {
+        return this.encryptHmacSha256Key;
+    }
+
+    public void setEncryptHmacSha256Key(String encryptHmacSha256Key) {
+        this.encryptHmacSha256Key = encryptHmacSha256Key;
+    }
+
+
     public boolean getIsSmsEnabled() {
         return this.isSmsEnabled;
     }
@@ -151,6 +172,8 @@ public class ForwardingConfig {
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
             json.put(KEY_CHUNKED_MODE, this.chunkedMode);
             json.put(KEY_IS_SMS_ENABLED, this.isSmsEnabled);
+            json.put(KEY_ENCRYPT_HMAC_SHA_256, this.encryptHmacSha256);
+            json.put(KEY_ENCRYPT_HMAC_SHA_256_KEY, this.encryptHmacSha256Key);
 
             SharedPreferences.Editor editor = getEditor(context);
             editor.putString(this.getKey(), json.toString());
@@ -212,6 +235,8 @@ public class ForwardingConfig {
                     try {
                         config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
                         config.setChunkedMode(json.getBoolean(KEY_CHUNKED_MODE));
+                        config.setEncryptHmacSha256(json.getBoolean(KEY_ENCRYPT_HMAC_SHA_256));
+                        config.setEncryptHmacSha256Key(json.getString(KEY_ENCRYPT_HMAC_SHA_256_KEY));
                     } catch (JSONException ignored) {
                     }
                 } catch (JSONException e) {

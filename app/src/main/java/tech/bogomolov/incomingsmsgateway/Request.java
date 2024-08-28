@@ -3,6 +3,8 @@ package tech.bogomolov.incomingsmsgateway;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,10 +19,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
+import java.util.Objects;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 
 import tech.bogomolov.incomingsmsgateway.SSLSocketFactory.TLSSocketFactory;
@@ -80,6 +86,28 @@ public class Request {
             this.error = RESULT_ERROR;
         }
     }
+
+    public String convertByteToHexadecimal(@NonNull byte[] byteArray) {
+        StringBuilder hex = new StringBuilder();
+        for (byte i : byteArray) {
+            hex.append(String.format("%02X", i));
+        }
+        return hex.toString().toLowerCase();
+    }
+
+    public void setSignatureHeader(@NonNull String encryptionKey, @NonNull String body) {
+        String algorithm = "HmacSHA256";
+        SecretKeySpec secretKeySpec = new SecretKeySpec(encryptionKey.getBytes(), algorithm);
+        try {
+            Mac mac = Mac.getInstance(algorithm);
+            mac.init(secretKeySpec);
+            String hmac_hex = convertByteToHexadecimal(mac.doFinal(body.getBytes()));
+            this.connection.setRequestProperty("X-Signature", hmac_hex);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            Log.e("ForwardingConfig", Objects.requireNonNull(e.getMessage()));
+        }
+    }
+
 
     public void setIgnoreSsl(boolean ignoreSsl) {
         this.ignoreSsl = ignoreSsl;
