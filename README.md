@@ -1,6 +1,6 @@
 # Incoming SMS to URL forwarder
 
-[Telegram Bot to check URL availability](https://t.me/uptime_onl_bot?start=share_bot)
+[Telegram Bot to check URL availability](https://t.me/uptime_onl_bot?start=github)
 
 ## How to use
 
