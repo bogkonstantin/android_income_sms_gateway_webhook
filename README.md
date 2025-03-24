@@ -1,5 +1,7 @@
 # Incoming SMS to URL forwarder
 
+[Telegram Bot to check URL availability](https://t.me/uptime_onl_bot?start=share_bot)
+
 ## How to use
 
 Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed
