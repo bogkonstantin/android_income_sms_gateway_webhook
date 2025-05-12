@@ -1,6 +1,22 @@
 # Incoming SMS to URL forwarder
 
-[Telegram Bot to check URL availability](https://t.me/uptime_onl_bot?start=github)
+This is a free, open-source Android app that automatically forwards incoming SMS messages to a specified URL as JSON via HTTP POST.
+* Forward SMS from specific numbers or all senders.
+* Retries failed requests with exponential backoff.
+* Includes sender, message, timestamp, SIM slot, and more.
+* Forward messages directly to Telegram bots or channels.
+* Built-in test message sender and error log viewer.
+* No cloud services or user registration required.
+
+## Download apk
+
+Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
+
+Or download it from F-Droid
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
 
 ## How to use
 
@@ -73,17 +89,9 @@ $payload = file_get_contents('php://input');
 $decoded = json_decode($payload, true);
 ```
 
-## Screenshots
+### Screenshots
 <img alt="Incoming SMS Webhook Gateway screenshot 1" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 2" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 3" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="30%"/>
 
-## Download apk
-
-Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
-
-Or download it from F-Droid
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
+### Misc
 
 This repository contains a stable app with minimum functionality. It is not archived, but not actively developing. If you need an app with merged PRs - try [this fork](https://github.com/scottmconway/android_income_sms_gateway_webhook)
