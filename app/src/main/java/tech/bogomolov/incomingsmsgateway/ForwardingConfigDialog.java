@@ -63,6 +63,13 @@ public class ForwardingConfigDialog {
         final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
         chunkedModeCheckbox.setChecked(true);
 
+        final CheckBox encrypt_hmac_sha_256_checkbox = view.findViewById(R.id.id_encrypt_hmac_sha_256);
+        final EditText encrypt_hmac_sha_256_input = view.findViewById(R.id.id_encrypt_hmac_sha_256_key);
+
+        encrypt_hmac_sha_256_checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            encrypt_hmac_sha_256_input.setEnabled(isChecked);
+        });
+
         prepareSimSelector(context, view, 0);
 
         builder.setView(view);
@@ -119,6 +126,17 @@ public class ForwardingConfigDialog {
 
         final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
         chunkedModeCheckbox.setChecked(config.getChunkedMode());
+
+        final CheckBox encryptHmacSha256CheckBox = view.findViewById(R.id.id_encrypt_hmac_sha_256);
+        encryptHmacSha256CheckBox.setChecked(config.getEncryptHmacSha256());
+
+        final EditText encryptHmacSha256Input = view.findViewById(R.id.id_encrypt_hmac_sha_256_key);
+        encryptHmacSha256Input.setText(String.valueOf(config.getEncryptHmacSha256Key()));
+        encryptHmacSha256Input.setEnabled(encryptHmacSha256CheckBox.isChecked());
+
+        encryptHmacSha256CheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            encryptHmacSha256Input.setEnabled(isChecked);
+        });
 
         builder.setView(view);
         builder.setPositiveButton(R.string.btn_save, null);
@@ -203,6 +221,13 @@ public class ForwardingConfigDialog {
         final CheckBox chunkedModeCheckbox = view.findViewById(R.id.input_chunked_mode);
         boolean chunkedMode = chunkedModeCheckbox.isChecked();
 
+        final CheckBox encryptHmacSha256CheckBox = view.findViewById(R.id.id_encrypt_hmac_sha_256);
+        boolean encryptHmacSha256 = encryptHmacSha256CheckBox.isChecked();
+
+        final EditText encryptHmacSha256Input = view.findViewById(R.id.id_encrypt_hmac_sha_256_key);
+        String encryptHmacSha256Key = encryptHmacSha256Input.getText().toString();
+
+
         config.setSender(sender);
         config.setUrl(url);
         config.setTemplate(template);
@@ -210,6 +235,8 @@ public class ForwardingConfigDialog {
         config.setRetriesNumber(retriesNum);
         config.setIgnoreSsl(ignoreSsl);
         config.setChunkedMode(chunkedMode);
+        config.setEncryptHmacSha256(encryptHmacSha256);
+        config.setEncryptHmacSha256Key(encryptHmacSha256Key);
 
         return config;
     }
@@ -252,8 +279,12 @@ public class ForwardingConfigDialog {
         Thread thread = new Thread(() -> {
             String payload = config.prepareMessage(
                     "123456789", "test message", "sim1", System.currentTimeMillis());
+
             Request request = new Request(config.getUrl(), payload);
             request.setJsonHeaders(config.getHeaders());
+            if (config.getEncryptHmacSha256()) {
+                request.setSignatureHeader(Objects.requireNonNull(config.getEncryptHmacSha256Key()), Objects.requireNonNull(payload));
+            }
             request.setIgnoreSsl(config.getIgnoreSsl());
             request.setUseChunkedMode(config.getChunkedMode());
 

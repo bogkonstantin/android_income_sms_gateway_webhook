@@ -1,9 +1,10 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fadeScrollbars="false">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/dialog_config_edit_form"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -231,5 +232,64 @@
                 android:layout_marginRight="20dp" />
 
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/id_encryption_subform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:scrollbars="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:ignore="ExtraText">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="16dp"
+                    android:labelFor="@+id/id_encrypt_hmac_sha_256"
+                    android:text="@string/label_encrypt_hmac_sha_256" />
+
+                <CheckBox
+                    android:id="@+id/id_encrypt_hmac_sha_256"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="-4dp"
+                android:text="@string/encrypt_hmac_sha_256_info"
+                android:textSize="11sp" />
+
+            <EditText
+                android:id="@+id/id_encrypt_hmac_sha_256_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="4dp"
+                android:enabled="false"
+                android:hint="@string/hint_encrypt_hmac_sha_256_key"
+                android:inputType="text" />
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

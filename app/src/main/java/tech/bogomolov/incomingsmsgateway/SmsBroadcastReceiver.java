@@ -94,6 +94,8 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 .putBoolean(RequestWorker.DATA_IGNORE_SSL, config.getIgnoreSsl())
                 .putBoolean(RequestWorker.DATA_CHUNKED_MODE, config.getChunkedMode())
                 .putInt(RequestWorker.DATA_MAX_RETRIES, config.getRetriesNumber())
+                .putBoolean(RequestWorker.DATA_ENCRYPT_HMAC_SHA_256, config.getEncryptHmacSha256())
+                .putString(RequestWorker.DATA_ENCRYPT_HMAC_SHA_256_KEY, config.getEncryptHmacSha256Key())
                 .build();
 
         WorkRequest workRequest =
