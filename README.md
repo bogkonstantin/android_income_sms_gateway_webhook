@@ -8,6 +8,10 @@ This is a free, open-source Android app that automatically forwards incoming SMS
 * Built-in test message sender and error log viewer.
 * No cloud services or user registration required.
 
+## Help Improve This Project
+
+If you've used or tested it, please take a minute to fill out [this short survey](https://forms.gle/c5YY7C81X33VjxyZ8) – it helps me understand real-world usage and prioritize new features. Thank you!
+
 ## Download apk
 
 Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
