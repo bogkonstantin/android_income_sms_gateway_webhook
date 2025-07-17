@@ -44,6 +44,13 @@ Press the Test button to make a test request to the server.
 
 Press the Syslog button to view errors stored in the Logcat.
 
+### Optional Features
+
+#### Sign with HMAC-SHA-256
+Selecting this option will allow you to sign the request with a provided secret. The hex signature 
+is created from the request payload and the provided secret, and will be added to the request with 
+the header `X-Signature`.
+
 ### Request info
 HTTP method: POST  
 Content-type: application/json; charset=utf-8  
