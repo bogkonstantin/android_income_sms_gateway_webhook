@@ -1,1 +1,1 @@
-simple incoming SMS to URL forwarder
+Simple incoming SMS to URL forwarder
