@@ -2,7 +2,6 @@ package tech.bogomolov.incomingsmsgateway.SSLSocketFactory;
 
 import android.annotation.SuppressLint;
 import android.net.SSLCertificateSocketFactory;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.InetAddress;

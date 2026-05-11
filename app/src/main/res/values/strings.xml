@@ -1,19 +1,31 @@
 <resources>
-    <string name="app_name">Incoming Sms Forwarder</string>
+    <string name="app_name">Sms Forwarder</string>
     <string name="permission_needed">Set permission to access SMS to use this app.</string>
     <string name="input_phone">66123456789</string>
     <string name="input_url">https://example.com</string>
+    <string name="label_advanced">Advanced parameters</string>
+    <string name="label_routing_params">Routing parameters</string>
     <string name="btn_add">Add</string>
+    <string name="btn_save">Save</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_clear">Clear</string>
+    <string name="btn_test">Test</string>
+    <string name="btn_edit">Edit</string>
     <string name="btn_delete">Delete</string>
+    <string name="btn_on">On</string>
+    <string name="btn_off">Off</string>
     <string name="delete_record">Delete record</string>
     <string name="key_phones_preference">phones</string>
     <string name="label_add_sender">Sender (number or text)</string>
+    <string name="label_number_retries">Number of retries</string>
     <string name="label_sender">Sender</string>
     <string name="label_url">Webhook URL</string>
     <string name="label_json_template">Json Payload Template</string>
     <string name="label_json_headers">Headers</string>
+    <string name="label_sim_slot">Sim Slot</string>
     <string name="label_ignore_ssl">Ignore SSL/TLS certificate errors</string>
+    <string name="label_chunked_mode">Chunked Mode (vs Fixed Length)</string>
     <string name="hint_sender">number or text</string>
     <string name="sender_recommendation">Use * symbol to catch any SMS</string>
     <string name="json_template_recommendation">Available placeholders %text%, %from%, %sentStamp%, %receivedStamp%, %sim%</string>
@@ -21,8 +33,10 @@
     <string name="error_empty_url">Empty URL</string>
     <string name="error_wrong_url">Wrong URL</string>
     <string name="error_wrong_json">Not a valid JSON object</string>
+    <string name="error_wrong_retries_number">Should be more than 0</string>
     <string name="asterisk">*</string>
     <string name="any">Any</string>
     <string name="confirm_delete">Do you really want to delete "%s" record?</string>
     <string name="notification_channel">Default</string>
+    <string name="menu_syslog">Syslog</string>
 </resources>

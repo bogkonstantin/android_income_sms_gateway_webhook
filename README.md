@@ -1,20 +1,48 @@
 # Incoming SMS to URL forwarder
 
-Try my new Android App - [Easy Expense Tracker](https://play.google.com/store/apps/details?id=tech.bogomolov.budget)
+This is a free, open-source Android app that automatically forwards incoming SMS messages to a specified URL as JSON via HTTP POST.
+* Forward SMS from specific numbers or all senders.
+* Retries failed requests with exponential backoff.
+* Includes sender, message, timestamp, SIM slot, and more.
+* Forward messages directly to Telegram bots or channels.
+* Built-in test message sender and error log viewer.
+* No cloud services or user registration required.
+
+## Help Improve This Project
+
+If you've used or tested it, please take a minute to fill out [this short survey](https://forms.gle/c5YY7C81X33VjxyZ8) – it helps me understand real-world usage and prioritize new features. Thank you!
+
+## Download apk
+
+Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
+
+Or download it from F-Droid
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
 
 ## How to use
 
-Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed and "Display pop-up windows while running in the background" from Xiaomi devices.
+Set up App Permissions for you phone after installation. For example, enable "Autostart" if needed
+and "Display pop-up windows while running in the background" from Xiaomi devices.
 
 Set sender phone number or name and URL. It should match the number or name you see in the SMS messenger app. 
 If you want to send any SMS to URL, use * (asterisk symbol) as a name.  
 
-Every incoming SMS will be sent immediately to the provided URL. 
-If the response code is not 2XX or the request ended with a connection error, the app will try to send again up to 10 times.
+Every incoming SMS will be sent immediately to the provided URL.
+If the response code is not 2XX or the request ended with a connection error, the app will try to
+send again up to 10 times (can be changed in parameters).
 Minimum first retry will be after 10 seconds, later wait time will increase exponentially.
-If the phone is not connected to the internet, the app will wait for the connection before the next attempt.
+If the phone is not connected to the internet, the app will wait for the connection before the next
+attempt.  
 
-If at least one Forwarding config is created and all needed permissions granted - you should see F icon in the status bar, means the app is listening for the SMS.
+If at least one Forwarding config is created and all needed permissions granted - you should see F
+icon in the status bar, means the app is listening for the SMS.
+
+Press the Test button to make a test request to the server.
+
+Press the Syslog button to view errors stored in the Logcat.
 
 ### Request info
 HTTP method: POST  
@@ -51,7 +79,7 @@ curl -X 'POST' 'https://yourwebsite.com/path' \
 1. Create Telegram bot and channel to receive messages. [There](https://bogomolov.tech/Telegram-notification-on-SSH-login/) is short tutorial how to do that.  
 2. Add new forwarding configuration in the app using this parameters:
    1. Any sender you need, * - on the screenshot
-   2. Webhook URL - https://api.telegram.org/bot<YourBOTToken>/sendMessage?chat_id=<channel_id> - change URL using your token and channel id
+   2. Webhook URL - `https://api.telegram.org/bot<YourBOTToken>/sendMessage?chat_id=<channel_id>` - change URL using your token and channel id
    3. Use this payload as a sample `{"text":"sms from %from% with text: \"%text%\" sent at %sentStamp%"}`
    4. Save configuration
 
@@ -65,15 +93,9 @@ $payload = file_get_contents('php://input');
 $decoded = json_decode($payload, true);
 ```
 
-## Screenshots
+### Screenshots
 <img alt="Incoming SMS Webhook Gateway screenshot 1" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 2" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="30%"/> <img alt="Incoming SMS Webhook Gateway screenshot 3" src="https://raw.githubusercontent.com/bogkonstantin/android_income_sms_gateway_webhook/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="30%"/>
 
-## Download apk
+### Misc
 
-Download apk from [release page](https://github.com/bogkonstantin/android_income_sms_gateway_webhook/releases)
-
-Or download it from F-Droid
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/tech.bogomolov.incomingsmsgateway/)
+This repository contains a stable app with minimum functionality. It is not archived, but not actively developing. If you need an app with merged PRs - try [this fork](https://github.com/scottmconway/android_income_sms_gateway_webhook)

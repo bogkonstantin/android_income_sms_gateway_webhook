@@ -75,13 +75,13 @@ public class WebhookCallerTest {
 
     private WorkInfo getWorkInfo(String url, String text, String headers, boolean ignoreSsl) throws Exception {
         Data input = new Data.Builder()
-                .put(WebHookWorkRequest.DATA_URL, url)
-                .put(WebHookWorkRequest.DATA_TEXT, text)
-                .put(WebHookWorkRequest.DATA_HEADERS, headers)
-                .put(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
+                .put(RequestWorker.DATA_URL, url)
+                .put(RequestWorker.DATA_TEXT, text)
+                .put(RequestWorker.DATA_HEADERS, headers)
+                .put(RequestWorker.DATA_IGNORE_SSL, ignoreSsl)
                 .build();
 
-        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WebHookWorkRequest.class)
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(RequestWorker.class)
                 .setInputData(input)
                 .build();
 

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SwitchCompat;
+
 import java.util.ArrayList;
 
 public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
@@ -52,11 +54,47 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         TextView headers = row.findViewById(R.id.text_headers);
         headers.setText(config.getHeaders());
 
+        SwitchCompat switchSmsOnOff = row.findViewById(R.id.switch_sms_on_off);
+        TextView switchSmsLabel = row.findViewById(R.id.text_sms_on_off);
+        if (config.getIsSmsEnabled()) {
+            switchSmsOnOff.setChecked(true);
+            switchSmsLabel.setText(R.string.btn_on);
+        } else {
+            switchSmsOnOff.setChecked(false);
+            switchSmsLabel.setText(R.string.btn_off);
+        }
+
+        switchSmsOnOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                config.setIsSmsEnabled(true);
+                switchSmsLabel.setText(R.string.btn_on);
+            } else {
+                config.setIsSmsEnabled(false);
+                switchSmsLabel.setText(R.string.btn_off);
+            }
+            config.save();
+        });
+
+        View editButton = row.findViewById(R.id.edit_button);
+        editButton.setTag(R.id.edit_button, position);
+        editButton.setOnClickListener(this::onEditClick);
+
         View deleteButton = row.findViewById(R.id.delete_button);
         deleteButton.setTag(R.id.delete_button, position);
         deleteButton.setOnClickListener(this::onDeleteClick);
 
         return row;
+    }
+
+    public void onEditClick(View view) {
+        ListAdapter listAdapter = this;
+        final int position = (int) view.getTag(R.id.edit_button);
+        final ForwardingConfig config = listAdapter.getItem(position);
+        (new ForwardingConfigDialog(
+                context,
+                (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE),
+                listAdapter
+        )).showEdit(config);
     }
 
     public void onDeleteClick(View view) {

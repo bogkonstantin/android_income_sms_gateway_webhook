@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_bar_syslogs"
+        android:title="@string/menu_syslog"
+        app:showAsAction="always"
+        />
+</menu>
