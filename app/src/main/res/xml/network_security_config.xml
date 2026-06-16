@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Trust user-installed CA certificates in addition to the system CAs.
+
+    Apps targeting API 24+ (this app targets 33) trust ONLY system CAs by
+    default; user-added CAs are excluded. Opting the user trust store back in
+    here lets a forwarding endpoint that uses a certificate signed by a
+    user-installed CA validate normally (full chain + hostname check) without
+    resorting to the per-rule "ignore SSL" option, which disables verification
+    entirely. Only honored on API 24+; pre-24 already trusted user CAs.
+
+    cleartextTrafficPermitted mirrors the manifest's usesCleartextTraffic="true"
+    so self-hosted/local HTTP endpoints keep working.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
