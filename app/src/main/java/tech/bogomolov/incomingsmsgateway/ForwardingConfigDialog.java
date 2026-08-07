@@ -120,6 +120,9 @@ public class ForwardingConfigDialog {
         final EditText smsFilterInput = view.findViewById(R.id.input_sms_filter);
         smsFilterInput.setText(config.getSmsFilter());
 
+        final EditText notificationFilterInput = view.findViewById(R.id.input_notification_filter);
+        notificationFilterInput.setText(config.getNotificationFilter());
+
         final EditText urlInput = view.findViewById(R.id.input_url);
         urlInput.setText(config.getUrl());
 
@@ -203,6 +206,9 @@ public class ForwardingConfigDialog {
         final EditText smsFilterInput = view.findViewById(R.id.input_sms_filter);
         String smsFilter = smsFilterInput.getText().toString();
 
+        final EditText notificationFilterInput = view.findViewById(R.id.input_notification_filter);
+        String notificationFilter = notificationFilterInput.getText().toString();
+
         final EditText urlInput = view.findViewById(R.id.input_url);
         String url = urlInput.getText().toString();
         if (TextUtils.isEmpty(url)) {
@@ -272,6 +278,7 @@ public class ForwardingConfigDialog {
         config.setSender(sender);
         config.setIsSenderRegex(isSenderRegex);
         config.setSmsFilter(smsFilter);
+        config.setNotificationFilter(notificationFilter);
         config.setUrl(url);
         config.setTemplate(template);
         config.setHeaders(headers);

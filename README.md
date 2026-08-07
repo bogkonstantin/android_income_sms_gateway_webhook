@@ -102,6 +102,33 @@ issue #46).
 **Workaround:** turn off RCS in Google Messages (Settings → RCS chats → *Turn off
 RCS chats*). Messages will then arrive as normal SMS and be forwarded correctly.
 
+### Notification forwarding recovery
+
+The app also has a notification-listener fallback for phones that do not
+deliver some verification SMS messages through `SMS_RECEIVED`. Open the action
+bar menu and tap **Notification access**, enable this app in Android system
+settings, then edit the forwarding rule's **Notification text filter**. The
+fallback reads the notification title and visible text. If the field is empty,
+every readable notification body is forwarded; if you enter a regex, only
+matching notification text is forwarded. The SMS text filter is used only for
+SMS broadcasts; the notification filter is used only for notifications. Both
+paths share the sender filter, template, HMAC signature and retry queue.
+
+Some Android vendors disconnect notification listeners after clearing an app
+from the task list. When this app is opened again, it now checks that
+notification access is still enabled and asks Android to rebind the listener
+immediately, then retries once after a short delay. The Syslog shows
+`requested notification listener rebind` followed by `notification listener
+connected` when recovery succeeds; toggling notification access should no
+longer be necessary.
+
+The notification title is used as `%from%` and the visible notification body is
+used as `%text%`; SIM-specific rules are not applied to notification messages.
+The app never logs the message body. Android/OEM settings can redact sensitive
+notification content or suppress notifications entirely; in that case no
+third-party notification listener can recover the code and the SMS fallback
+cannot help.
+
 ### Optional Features
 
 #### Match the sender with a regex

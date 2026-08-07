@@ -26,6 +26,7 @@ public class ForwardingConfig {
     private static final String KEY_SENDER = "sender";
     private static final String KEY_IS_SENDER_REGEX = "is_sender_regex";
     private static final String KEY_SMS_FILTER = "sms_filter";
+    private static final String KEY_NOTIFICATION_FILTER = "notification_filter";
     private static final String KEY_URL = "url";
     private static final String KEY_SIM_SLOT = "sim_slot";
     private static final String KEY_TEMPLATE = "template";
@@ -43,6 +44,7 @@ public class ForwardingConfig {
     private String sender;
     private boolean isSenderRegex = false; // when true, sender is matched as a regex
     private String smsFilter = ""; // empty means forward every message
+    private String notificationFilter = ""; // empty means forward every readable notification
     private String url;
     private int simSlot = 0; // 0 means any
     private String template;
@@ -90,6 +92,14 @@ public class ForwardingConfig {
 
     public void setSmsFilter(String smsFilter) {
         this.smsFilter = smsFilter == null ? "" : smsFilter;
+    }
+
+    public String getNotificationFilter() {
+        return this.notificationFilter;
+    }
+
+    public void setNotificationFilter(String notificationFilter) {
+        this.notificationFilter = notificationFilter == null ? "" : notificationFilter;
     }
 
     public String getUrl() {
@@ -213,6 +223,7 @@ public class ForwardingConfig {
         json.put(KEY_SENDER, this.sender);
         json.put(KEY_IS_SENDER_REGEX, this.isSenderRegex);
         json.put(KEY_SMS_FILTER, this.smsFilter);
+        json.put(KEY_NOTIFICATION_FILTER, this.notificationFilter);
         json.put(KEY_URL, this.url);
         json.put(KEY_SIM_SLOT, this.simSlot);
         json.put(KEY_TEMPLATE, this.template);
@@ -282,6 +293,9 @@ public class ForwardingConfig {
 
                 if (json.has(KEY_SMS_FILTER)) {
                     config.setSmsFilter(json.getString(KEY_SMS_FILTER));
+                }
+                if (json.has(KEY_NOTIFICATION_FILTER)) {
+                    config.setNotificationFilter(json.getString(KEY_NOTIFICATION_FILTER));
                 }
 
                 if (json.has(KEY_IS_SMS_ENABLED)) {

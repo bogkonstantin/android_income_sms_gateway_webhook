@@ -2,12 +2,15 @@ package tech.bogomolov.incomingsmsgateway;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Context context;
     private ListAdapter listAdapter;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Runnable notificationRebindRetry =
+            () -> NotificationListener.requestRebindIfEnabled(
+                    getApplicationContext(), "activity resume retry");
 
     private static final int PERMISSION_CODE = 0;
 
@@ -95,6 +102,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // OEM task cleaners can kill a NotificationListenerService without
+        // delivering onListenerDisconnected. Opening the app must recover it
+        // without requiring the user to toggle Notification access manually.
+        NotificationListener.requestRebindIfEnabled(getApplicationContext(), "activity resume");
+        mainHandler.removeCallbacks(notificationRebindRetry);
+        mainHandler.postDelayed(notificationRebindRetry, 1000L);
         // Failures accrue in the background, so refresh the retry counter each
         // time the activity comes forward.
         invalidateOptionsMenu();
@@ -104,6 +117,12 @@ public class MainActivity extends AppCompatActivity {
             listAdapter.clear();
             listAdapter.addAll(ForwardingConfig.getAll(this));
         }
+    }
+
+    @Override
+    protected void onPause() {
+        mainHandler.removeCallbacks(notificationRebindRetry);
+        super.onPause();
     }
 
     @Override
@@ -132,6 +151,17 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_bar_notification_access) {
+            try {
+                // Use the action string instead of the API-21 constant so the
+                // APK remains safe on older devices (minSdk is 14).
+                startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, R.string.notification_access_unavailable, Toast.LENGTH_LONG).show();
+            }
+            return true;
+        }
+
         if (id == R.id.action_bar_retry_failed) {
             int count = FailedMessage.getCount(this);
             FailedMessage.retryAll(this);
@@ -141,14 +171,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_bar_syslogs) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             View view = getLayoutInflater().inflate(R.layout.syslogs, null);
 
             String logs = "";
             try {
+                // Runtime.exec does not interpret shell pipes. Use logcat's own
+                // tag filters so receiver and webhook diagnostics are visible.
                 String[] command = new String[]{
-                        "logcat", "-d", "*:E", "-m", "1000",
-                        "|", "grep", "tech.bogomolov.incomingsmsgateway"};
+                        "logcat", "-d", "-v", "time", "-s",
+                        "SmsBroadcastReceiver:I",
+                        "NotificationListener:I",
+                        "SmsGateway:I",
+                        "RequestWorker:I",
+                        "AndroidRuntime:E"};
                 Process process = Runtime.getRuntime().exec(command);
 
                 BufferedReader bufferedReader = new BufferedReader(

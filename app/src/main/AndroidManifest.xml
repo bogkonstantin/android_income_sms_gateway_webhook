@@ -22,6 +22,17 @@
             android:enabled="true"
             android:exported="true" />
 
+        <service
+            android:name=".NotificationListener"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <!--
             SMS delivery is driven by this manifest-declared receiver, not by a
             receiver registered at runtime inside SmsReceiverService. SMS_RECEIVED

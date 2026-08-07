@@ -91,4 +91,23 @@ public class SmsBroadcastReceiverMatchTest {
         // drops SMS — the opposite of the sender matcher.
         assertTrue(SmsBroadcastReceiver.matchesFilter("[unclosed", "any body"));
     }
+
+    @Test
+    public void notificationFilterMatchesOnlyNotificationContent() {
+        assertTrue(SmsBroadcastReceiver.matchesNotificationFilter(
+                "(?i)呱呱研选.*验证码", "【呱呱研选】您的验证码为：420790"));
+        assertFalse(SmsBroadcastReceiver.matchesNotificationFilter(
+                "(?i)呱呱研选.*验证码", "【呱呱研选】活动提醒"));
+    }
+
+    @Test
+    public void emptyNotificationFilterAllowsAllReadableNotificationText() {
+        assertTrue(SmsBroadcastReceiver.matchesNotificationFilter("", "你好，你中奖了"));
+        assertTrue(SmsBroadcastReceiver.matchesNotificationFilter(null, "普通微信消息"));
+    }
+
+    @Test
+    public void invalidNotificationFilterFailsClosed() {
+        assertFalse(SmsBroadcastReceiver.matchesNotificationFilter("[unclosed", "any body"));
+    }
 }

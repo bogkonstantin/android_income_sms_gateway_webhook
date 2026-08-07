@@ -57,6 +57,22 @@ public class SmsReceiverTest {
     }
 
     @Test
+    public void testSmsPassedToWebhookWithExplicitPduFormat() {
+        this.setPhoneConfig(appContext, appContext.getString(R.string.asterisk));
+        SmsBroadcastReceiver receiver = this.getSmsReceiver();
+        receiver.onReceive(appContext, this.getIntentWithFormat("3gpp"));
+
+        Mockito.verify(receiver, Mockito.times(1))
+                .callWebHook(
+                        Mockito.any(ForwardingConfig.class),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyString(),
+                        Mockito.anyLong()
+                );
+    }
+
+    @Test
     public void testSmsPassedToWebhookByNumber() {
         this.setPhoneConfig(appContext, this.getSender());
         SmsBroadcastReceiver receiver = this.getSmsReceiver();
@@ -204,6 +220,12 @@ public class SmsReceiverTest {
     private Intent getIntentMultiPdus() {
         Intent intent = new Intent(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
         intent.putExtra("pdus", this.getTestMultiplePdu());
+        return intent;
+    }
+
+    private Intent getIntentWithFormat(String format) {
+        Intent intent = this.getIntent();
+        intent.putExtra("format", format);
         return intent;
     }
 
