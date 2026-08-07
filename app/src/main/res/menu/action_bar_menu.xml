@@ -13,6 +13,11 @@
         app:showAsAction="always"
         />
     <item
+        android:id="@+id/action_bar_notification_access"
+        android:title="@string/menu_notification_access"
+        app:showAsAction="never"
+        />
+    <item
         android:id="@+id/action_bar_syslogs"
         android:title="@string/menu_syslog"
         app:showAsAction="never"

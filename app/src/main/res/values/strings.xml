@@ -30,6 +30,8 @@
     <string name="sign_hmac_sha256_info">Hex signature will be included to the request headers as \"X-Signature\"</string>
     <string name="label_sms_filter">Text filter (regex, optional)</string>
     <string name="sms_filter_recommendation">Forward only if the message matches this regex. E.g. OTP forwards messages containing OTP; (?s)^(?!.*OTP) forwards those that don\'t.</string>
+    <string name="label_notification_filter">Notification text filter (regex, optional)</string>
+    <string name="notification_filter_recommendation">Applied only to notification fallback. Leave empty to forward all readable notification text; a non-empty regex forwards only matching text.</string>
     <string name="hint_sign_hmac_sha256_secret">HMAC-SHA-256 Secret</string>
     <string name="sender_recommendation">Use * symbol to catch any SMS</string>
     <string name="label_sender_regex">Sender is a regular expression</string>
@@ -47,6 +49,8 @@
     <string name="notification_channel">Default</string>
     <string name="menu_syslog">Syslog</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_notification_access">Notification access</string>
+    <string name="notification_access_unavailable">Notification access settings are unavailable on this device.</string>
     <string name="title_settings">Settings</string>
     <string name="label_heartbeat_section">Heartbeat monitoring</string>
     <string name="heartbeat_info">Periodically pings a URL so an external monitor (e.g. healthchecks.io, Uptime Kuma, cronitor) can alert you if this phone stops working and the pings stop.</string>

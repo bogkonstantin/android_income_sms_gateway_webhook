@@ -41,6 +41,7 @@ public class ForwardingConfigTest {
     public void testSaveAndGetAllRoundTrip() {
         ForwardingConfig config = new ForwardingConfig(context);
         config.setSender("+16505551111");
+        config.setNotificationFilter("(?i)呱呱研选.*验证码");
         config.setUrl("https://example.com/hook");
         config.setSimSlot(2);
         config.setTemplate("{\"text\":\"%text%\"}");
@@ -58,6 +59,7 @@ public class ForwardingConfigTest {
 
         ForwardingConfig loaded = all.get(0);
         assertEquals("+16505551111", loaded.getSender());
+        assertEquals("(?i)呱呱研选.*验证码", loaded.getNotificationFilter());
         assertEquals("https://example.com/hook", loaded.getUrl());
         assertEquals(2, loaded.getSimSlot());
         assertEquals("{\"text\":\"%text%\"}", loaded.getTemplate());
@@ -192,6 +194,7 @@ public class ForwardingConfigTest {
         // must survive an export → wipe → import cycle byte-for-byte, including key.
         ForwardingConfig config = new ForwardingConfig(context);
         config.setSender("+16505551111");
+        config.setNotificationFilter("(?i)验证码");
         config.setUrl("https://example.com/hook");
         config.setSimSlot(2);
         config.setTemplate("{\"text\":\"%text%\"}");
@@ -219,6 +222,7 @@ public class ForwardingConfigTest {
         ForwardingConfig loaded = ForwardingConfig.getAll(context).get(0);
         assertEquals(originalKey, loaded.getKey());
         assertEquals("+16505551111", loaded.getSender());
+        assertEquals("(?i)验证码", loaded.getNotificationFilter());
         assertEquals("https://example.com/hook", loaded.getUrl());
         assertEquals(2, loaded.getSimSlot());
         assertEquals("{\"text\":\"%text%\"}", loaded.getTemplate());

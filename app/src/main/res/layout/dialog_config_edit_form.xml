@@ -73,6 +73,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_medium"
+            android:hint="@string/label_notification_filter"
+            app:helperText="@string/notification_filter_recommendation">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_notification_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/AppTheme.TextInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:hint="@string/label_url"
             app:helperText="@string/input_url">
 
